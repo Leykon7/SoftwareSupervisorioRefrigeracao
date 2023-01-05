@@ -24,3 +24,71 @@
                 size: self.size
         Image:
             source: 'imgs/BackgroundV1.png'
+
+        #Ventiladores
+
+        BoxLayout:
+            orientation:'horizontal'
+        CheckBox:
+            color: 0, 0, 0, 1
+            size_hint: 0.05,0.05
+            pos: 145,385
+            group: 'ventilador'
+        Label:
+            text: 'Axial'
+            pos: 165,385
+            size_hint: 0.065, 0.04
+        CheckBox:
+            color: 0, 0, 0,1
+            size_hint: 0.05,0.05
+            pos: 235,385
+            group: 'ventilador'
+        Label:
+            text: 'Radial'
+            pos: 265,385
+            size_hint: 0.065, 0.04
+        Button:
+            text: 'Comando'
+            size_hint: 0.065, 0.04
+            pos: 140,355
+        Button:
+            text: 'Medidas'
+            size_hint: 0.065, 0.04
+            pos: 260,355
+
+        #Compressores
+
+        CheckBox:
+            color: 0, 0, 0, 1
+            size_hint: 0.05,0.05
+            pos: 125,245
+            group: 'compressores'
+        Button:
+            text: 'Comando'
+            size_hint: 0.065, 0.04
+            pos: 140,180
+        Button:
+            text: 'Medidas'
+            size_hint: 0.065, 0.04
+            pos: 140,140
+        CheckBox:
+            color: 0, 0, 0, 1
+            size_hint: 0.05,0.05
+            pos: 125,75
+            group: 'compressores'
+        
+        #Valvulas
+
+        # Image:
+        #     id: valvula1
+        #     pos: 0,0
+
+        #Sensores
+
+        Label:
+            id: temperatura1
+            color: 0,0,0,1
+            text: '58ºC'
+            size_hint: 0.065, 0.04
+            pos: 600,300
+

@@ -1,8 +1,10 @@
 from kivy.app import App
 from interface import Interface
 from kivy.lang.builder import Builder
+from kivy.core.window import Window
+from kivy.config import Config
 
-class PrincipalApp(App):
+class Principal(App):
     """
     Classe com o aplicativo
     """
@@ -14,5 +16,8 @@ class PrincipalApp(App):
         return self._widget
  
 if __name__ == '__main__':
+    #Window.size=(1280, 720)
+    #Window.resizable=False
+    Window.fullscreen = 'auto'
     Builder.load_string(open("interface.kv",encoding="utf-8").read(),rulesonly=True)
-    PrincipalApp().run()
+    Principal().run()
