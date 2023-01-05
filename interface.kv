@@ -1,4 +1,26 @@
 #:kivy 1.11.1
-<MyWidget>:
-    orientation: 'horizontal'
-    
+<Interface>:
+    orientation: 'vertical'
+    canvas:
+        Color:
+            rgb: 0.5,0.5,0.5
+        Rectangle:
+            size: self.size
+    BoxLayout:
+        orientation:'horizontal'
+        size_hint: (1, 0.1)
+        spacing: 10
+        Label:
+            text: 'SUPERVISÓRIO v1.0'
+            size_hint_x: None
+            width: 300
+        Button:
+            text: 'oi'
+    FloatLayout:
+        canvas:
+            Color:
+                rgb: 0.882352941176, 0.894117647059, 0.921568627451
+            Rectangle:
+                size: self.size
+        Image:
+            source: 'imgs/BackgroundV1.png'

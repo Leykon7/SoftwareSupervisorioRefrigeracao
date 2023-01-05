@@ -1,18 +1,18 @@
-import kivy
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.config import Config
+from interface import Interface
+from kivy.lang.builder import Builder
 
-class MyWidget(BoxLayout):
-    pass
-
-class InterfaceApp(App):
+class PrincipalApp(App):
+    """
+    Classe com o aplicativo
+    """
     def build(self):
         """
         Método para construção do aplicativo com base no widget criado
         """
-        return MyWidget()
+        self._widget = Interface()
+        return self._widget
  
 if __name__ == '__main__':
-    Config.set('graphics','resizable',True)
-    InterfaceApp().run()
+    Builder.load_string(open("interface.kv",encoding="utf-8").read(),rulesonly=True)
+    PrincipalApp().run()
