@@ -2,7 +2,6 @@ from kivy.app import App
 from interface import Interface
 from kivy.lang.builder import Builder
 from kivy.core.window import Window
-from kivy.config import Config
 
 class Principal(App):
     """
@@ -14,7 +13,7 @@ class Principal(App):
         """
         self._widget = Interface()
         return self._widget
- 
+
 if __name__ == '__main__':
     #Window.size=(1280, 720)
     #Window.resizable=False
