@@ -21,3 +21,4 @@ class medidasComp(Popup):
     """
     Medidas dos Ventiladores
     """
+    pass

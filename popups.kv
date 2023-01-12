@@ -2,27 +2,72 @@
 
 <comandoVent>:
     title: 'Comandos dos ventiladores'
-    size_hint_y: None
-    size_hint_x: 0.4
-    height: 200
+    size_hint: 0.75,0.5
+
     BoxLayout:
         orientation: 'horizontal'
-        Button:
-            text:'a'
-        Button:
-            text:'b'
+        spacing: 35
+        # canvas:
+        #     Color:
+        #         rgb: 225/255, 228/255, 235/255
+        #     Rectangle:
+        #         size: self.size
+        #         pos: self.pos
+        
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 35
+            Label:
+                text: 'Comando do Ventilador'
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 35
+                Button:
+                    text:'Ligar'
+                Button:
+                    text:'Desligar'
+                Button:
+                    text: 'Resetar'
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 35
+                CheckBox:
+                    id: axial
+                Label:
+                    text:'Axial'
+                CheckBox:
+                    id: radial
+                Label:
+                    text:'Radial'
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 35
+            Label:
+                text: 'Selecionar Tipo de partida'
+            Button:
+                text: 'Tesys Direta'
+            Button:
+                text: 'ATV31 Inversor'
+            Button:
+                text: 'ATS48 Soft-start'
+
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                text: 'teste'
+    
 
 <comandoComp>:
-    title: 'Comandos dos ventiladores'
+    title: 'Comandos dos compressores'
     size_hint_y: None
     size_hint_x: 0.4
     height: 200
     BoxLayout:
         orientation: 'horizontal'
         Button:
-            text:'a'
+            text:'1'
         Button:
-            text:'b'
+            text:'b2'
 
 <medidasComp>:
     title: 'Medidas dos Compressores'
@@ -32,9 +77,9 @@
     BoxLayout:
         orientation: 'horizontal'
         Button:
-            text:'a'
+            text:'a3'
         Button:
-            text:'b'
+            text:'b4'
 
 <medidasVent>:
     title: 'Medidas dos ventiladores'
@@ -44,6 +89,6 @@
     BoxLayout:
         orientation: 'horizontal'
         Button:
-            text:'a'
+            text:'a3'
         Button:
-            text:'b'
+            text:'b5'
