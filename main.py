@@ -19,4 +19,5 @@ if __name__ == '__main__':
     #Window.resizable=False
     Window.fullscreen = 'auto'
     Builder.load_string(open("interface.kv",encoding="utf-8").read(),rulesonly=True)
+    Builder.load_string(open("popups.kv",encoding="utf-8").read(),rulesonly=True)
     Principal().run()

@@ -2,21 +2,6 @@
 
 <Interface>:
     orientation: 'vertical'
-    canvas:
-        Color:
-            rgb: 0.5,0.5,0.5
-        Rectangle:
-            size: self.size
-    BoxLayout:
-        orientation:'horizontal'
-        size_hint: (1, 0.1)
-        spacing: 10
-        Label:
-            text: 'SUPERVISÓRIO v1.0'
-            size_hint_x: None
-            width: 300
-        Button:
-            text: 'oi'
     FloatLayout:
         canvas:
             Color:
@@ -24,43 +9,51 @@
             Rectangle:
                 size: self.size
         Image:
-            source: 'imgs/BackgroundV1.png'
+            source: 'imgs/BackgroundV2.png'
 
-        #Ventiladores
+        #Ventiladores Comandos
 
-        BoxLayout:
-            orientation:'horizontal'
+                    
         CheckBox:
-            color: 0, 0, 0, 1
+            color: 98/255, 113/255, 142/255
             size_hint: 0.05,0.05
-            pos: 145,385
+            pos_hint: {'x':0.037, 'y':0.485}
             group: 'ventilador'
+            on_active: root.checkboxes(0)
+        
         Label:
             text: 'Axial'
-            pos: 165,385
+            pos_hint: {'x':0.052, 'y':0.487}
             size_hint: 0.065, 0.04
+            color: 98/255, 113/255, 142/255
         CheckBox:
-            color: 0, 0, 0,1
+            color: 98/255, 113/255, 142/255
             size_hint: 0.05,0.05
-            pos: 235,385
+            pos_hint: {'x':0.137, 'y':0.485}
             group: 'ventilador'
+            on_active: root.checkboxes(1)
         Label:
             text: 'Radial'
-            pos: 265,385
+            pos_hint: {'x':0.152, 'y':0.487}
             size_hint: 0.065, 0.04
+            color: 98/255, 113/255, 142/255
         Button:
             text: 'Comando'
             size_hint: 0.065, 0.04
-            pos: 140,355
+            #pos: 65,375 #140,355
+            pos_hint: {'x':0.045, 'y':0.44}
             background_normal: ''
             background_color: 133/255, 146/255, 171/255
             background_down: ''
             on_press: self.background_color= (85/255, 101/255, 133/255)
             on_release: self.background_color= (133/255, 146/255, 171/255)
+            on_release: root._comandoVent.open()
+
         Button:
             text: 'Medidas'
             size_hint: 0.065, 0.04
-            pos: 260,355
+            pos_hint: {'x':0.143, 'y':0.44}
+            #pos: 285,375
             background_normal: ''
             background_color: 133/255, 146/255, 171/255
             background_down: ''
@@ -70,14 +63,15 @@
         #Compressores
 
         CheckBox:
-            color: 0, 0, 0, 1
+            id: scroll
+            color: 98/255, 113/255, 142/255
             size_hint: 0.05,0.05
-            pos: 125,245
+            pos_hint: {'x':0.075, 'y':0.293}
             group: 'compressores'
         Button:
             text: 'Comando'
             size_hint: 0.065, 0.04
-            pos: 140,180
+            pos_hint: {'x':0.045, 'y':0.233}
             background_normal: ''
             background_color: 133/255, 146/255, 171/255
             background_down: ''
@@ -86,7 +80,7 @@
         Button:
             text: 'Medidas'
             size_hint: 0.065, 0.04
-            pos: 140,140
+            pos_hint: {'x':0.045, 'y':0.159}
             background_normal: ''
             background_color: 133/255, 146/255, 171/255
             background_down: ''
@@ -94,30 +88,115 @@
             on_release: self.background_color= (133/255, 146/255, 171/255)
             
         CheckBox:
-            color: 0, 0, 0, 1
+            color: 98/255, 113/255, 142/255
             size_hint: 0.05,0.05
-            pos: 125,75
+            pos_hint: {'x':0.075, 'y':0.093}
             group: 'compressores'
         
         #Valvulas
 
-        # Image:
-        #     id: valvula1
-        #     pos: 0,0
+        Image:
+            id: xv1
+            source: 'imgs/ValvulaAzul.png'
+            size_hint: 0.12,0.12
+            pos: 352,250
+            #-30,+24
+        Image:
+            id: xv2
+            source: 'imgs/ValvulaBranca.png'
+            size_hint: 0.12,0.12
+            pos: 352,165
+            #+15
+        Image:
+            id: xv3
+            source: 'imgs/ValvulaAzul.png'
+            size_hint: 0.12,0.12
+            pos: 352,106
+
+        Image:
+            id: xv4
+            source: 'imgs/ValvulaBranca.png'
+            size_hint: 0.12,0.12
+            pos: 352,22
+        
+        Image:
+            id: xv5
+            source: 'imgs/ValvulaAzul.png'
+            size_hint: 0.12,0.12
+            #pos: 1172,71
+            pos_hint: {'x':0.7635, 'y':0.083}
+
 
         #Sensores
 
         Label:
-            id: temperatura1
-            color: 0,0,0,1
-            text: '58ºC'
+            id: pit1
+            color: 98/255, 113/255, 142/255
+            text: '20 Pa'
             size_hint: 0.065, 0.04
-            pos: 600,300
+            pos: 560,310
+            font_size: 21
+
+        Label:
+            id: tit1
+            color: 98/255, 113/255, 142/255
+            text: '58 ºC'
+            size_hint: 0.065, 0.04
+            pos: 725,310
+            font_size: 21
+
+        Label:
+            id: pit2
+            color: 98/255, 113/255, 142/255
+            text: '20 Pa'
+            size_hint: 0.065, 0.04
+            pos: 560,225
+            font_size: 21
+
+        Label:
+            id: tit2
+            color: 98/255, 113/255, 142/255
+            text: '58 ºC'
+            size_hint: 0.065, 0.04
+            pos: 725,225
+            font_size: 21
+
+        Label:
+            id: pit3
+            color: 98/255, 113/255, 142/255
+            text: '20 Pa'
+            size_hint: 0.065, 0.04
+            pos: 375,630
+            font_size: 21
+
+        Label:
+            id: pit4
+            color: 98/255, 113/255, 142/255
+            text: '20 Pa'
+            size_hint: 0.065, 0.04
+            pos: 830,630
+            font_size: 21
+
+        Label:
+            id: vel
+            color: 98/255, 113/255, 142/255
+            text: '100 m/s'
+            size_hint: 0.065, 0.04
+            pos: 830,660
+            font_size: 21
+
+        Label:
+            id: tit3
+            color: 98/255, 113/255, 142/255
+            text: '20ºC'
+            size_hint: 0.065, 0.04
+            pos: 830,690
+            font_size: 21
 
         #Hélices
 
         Helices:
-            pos:-534,75
+            pos:-589,85 #-534,75
             canvas.before:
                 PushMatrix
                 Rotate:
@@ -133,7 +212,7 @@
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
         Helices:
-            pos:-528,234
+            pos:-593,255
             canvas.before:
                 PushMatrix
                 Rotate:
@@ -148,3 +227,73 @@
                 size_hint: 0.12,0.12
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
+        #Venezianas
+
+        Slider:
+            min: -90
+            max: 0
+            step: 1
+            orientation: 'horizontal'
+            color: 1, 1, 1
+            size_hint: 0.1,0.1
+            pos: 500, 550
+            on_value: root.venezianas(*args)
+
+        Image:
+            id: veneziana1
+            source: 'imgs/FlapFechado.png'
+            keep_ratio: False
+            pos: 565.5,633.75
+            size_hint: 0.003,0.040
+            angle: 0
+            allow_stretch: True
+            canvas.before:
+                PushMatrix
+                Rotate:
+                    angle: self.angle
+                    origin: self.center
+            canvas.after:
+                PopMatrix
+
+        Image:
+            id: veneziana2
+            source: 'imgs/FlapFechado.png'
+            size_hint: 0.003,0.040
+            pos: 565.5,668.55
+            allow_stretch: True
+            keep_ratio: False
+            angle: 0
+            canvas.before:
+                PushMatrix
+                Rotate:
+                    angle: self.angle
+                    origin: self.center
+            canvas.after:
+                PopMatrix
+
+        Image:
+            id: veneziana3
+            source: 'imgs/FlapFechado.png'
+            size_hint: 0.003,0.040
+            pos: 565.5,703.5 
+            allow_stretch: True
+            keep_ratio: False
+            angle: 0
+            canvas.before:
+                PushMatrix
+                Rotate:
+                    angle: self.angle
+                    origin: self.center
+            canvas.after:
+                PopMatrix
+
+        Button:
+            text: 'Medidas'
+            size_hint: 0.065, 0.04
+            pos: 525, 525
+            #pos_hint: {'x':0.045, 'y':0.159}
+            background_normal: ''
+            background_color: 133/255, 146/255, 171/255
+            background_down: ''
+            on_press: self.background_color= (85/255, 101/255, 133/255)
+            on_release: self.background_color= (133/255, 146/255, 171/255)
