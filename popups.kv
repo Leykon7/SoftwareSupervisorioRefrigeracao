@@ -1,94 +1,599 @@
 #:kivy 1.11.1
 
+<ModbusPopup>:
+    title: 'Configurações MODBUS'
+    size_hint: 0.25,0.25
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 7
+        padding:7
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            orientation:'vertical'
+            padding:7
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            GridLayout:
+                spacing: 7
+                cols: 2
+                rows: 3
+                Label:
+                    text: 'IP'
+                    font_size: 14
+                    color: 98/255, 113/255, 142/255
+                TextInput:
+                    id: txt_ip
+                    text: '127.0.0.1'
+                    fonte_size: 14
+                    halign: 'center'
+                    valign: 'middle'
+                Label:
+                    text: 'Porta'
+                    font_size: 14
+                    color: 98/255, 113/255, 142/255
+                TextInput:
+                    id: txt_porta
+                    text: '502'
+                    fonte_size: 14
+                    halign: 'center'
+                    valign: 'middle'
+                TempBotao:
+                    text: 'Conectar'
+                    on_release:
+                        app.root.iniciaColetaDados(txt_ip.text,int(txt_porta.text))
+                TempBotao:
+                    text: 'Fechar'
+                    on_release:
+                        root.dismiss()
+                    #     root.clearInfo()
+
+<info>:
+    size_hint:0.20,0.2
+    BoxLayout:
+        orientation:'vertical'
+        padding:7
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            id: info
+            orientation:'vertical'
+            padding:7
+            size_hint:0.75,0.5
+            pos_hint:{'center_x':0.5,'center_y':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+        BoxLayout:
+            orientation:'vertical'
+            padding:7
+            size_hint:0.75,0.5
+            pos_hint:{'center_x':0.5,'center_y':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text:'Fechar'
+                on_release: 
+                    root.dismiss()
+                    root.limparInfo()
+<ScanPopup>:
+    title: "Configuração ScanTime"
+    size_hint: 0.25,0.25
+    BoxLayout:
+        orientation:'vertical'
+        spacing:7
+        padding:7
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos  
+        BoxLayout:
+            orientation:'vertical'
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            GridLayout:
+                cols: 2
+                rows: 1
+                size_hint_y:0.15
+                padding:7
+                Label:
+                    text:'Scantime [ms]'
+                    color: 98/255, 113/255, 142/255
+                TextInput:
+                    id:txt_st
+                    halign: 'center'
+                    valign: 'middle'
+            BoxLayout:
+                orientation:'vertical'
+                spacing:7
+                size_hint_y:0.33
+                padding:7
+                TempBotao:
+                    text:'Configurar'
+                    on_release:
+                        app.root._scan_time = int(txt_st.text)
+                TempBotao:
+                    text:'Fechar'
+                    on_release: root.dismiss()                    
+
 <comandoVent>:
     title: 'Comandos dos ventiladores'
-    size_hint: 0.75,0.5
-
+    size_hint: 0.5, 0.5
+    spacing: 49
     BoxLayout:
-        orientation: 'horizontal'
-        spacing: 35
-        # canvas:
-        #     Color:
-        #         rgb: 225/255, 228/255, 235/255
-        #     Rectangle:
-        #         size: self.size
-        #         pos: self.pos
-        
-        BoxLayout:
-            orientation: 'vertical'
-            spacing: 35
+        orientation:'vertical'
+        spacing:14
+        padding:14
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        GridLayout:
+            cols:2
+            rows:4
+            spacing:7
+            padding:7
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            #11
             Label:
                 text: 'Comando do Ventilador'
-            BoxLayout:
-                orientation: 'horizontal'
-                spacing: 35
-                Button:
-                    text:'Ligar'
-                Button:
-                    text:'Desligar'
-                Button:
-                    text: 'Resetar'
-            BoxLayout:
-                orientation: 'horizontal'
-                spacing: 35
-                CheckBox:
-                    id: axial
-                Label:
-                    text:'Axial'
-                CheckBox:
-                    id: radial
-                Label:
-                    text:'Radial'
-        BoxLayout:
-            orientation: 'vertical'
-            spacing: 35
+                color: 98/255, 113/255, 142/255
+            #12
             Label:
                 text: 'Selecionar Tipo de partida'
-            Button:
+                color: 98/255, 113/255, 142/255
+            #21
+            TempBotao:
+                text:'Ligar'
+            #22
+            TempBotao:
                 text: 'Tesys Direta'
-            Button:
+            #31 
+            TempBotao:
+                text:'Desligar'
+            #32
+            TempBotao:
                 text: 'ATV31 Inversor'
-            Button:
-                text: 'ATS48 Soft-start'
+                on_release: root._inversor.open()
+            #41
+            TempBotao:
+                text: 'Resetar'
+            #42
+            TempBotao:
+                text: 'ATS48 Soft-start'              
+            
+        BoxLayout:
+            orientation: 'horizontal'
+            padding:7
+            size_hint:0.5,0.2
+            pos_hint:{'center_x':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            CheckBox:
+                id: axial
+                group: 'ventilador'
+                color: 98/255, 113/255, 142/255
+            Label:
+                text:'Axial'
+                color: 98/255, 113/255, 142/255
+                halign:'left'
+            CheckBox:
+                id: radial
+                group: 'ventilador'
+                color: 98/255, 113/255, 142/255
+            Label:
+                text:'Radial'
+                color: 98/255, 113/255, 142/255
+                halign:'left'
 
         BoxLayout:
-            orientation: 'vertical'
-            Button:
-                text: 'teste'
-    
+            orientation:'horizontal'
+            padding:7
+            size_hint:0.5,0.25
+            pos_hint:{'center_x':0.5}
 
-<comandoComp>:
-    title: 'Comandos dos compressores'
-    size_hint_y: None
-    size_hint_x: 0.4
-    height: 200
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text:'Fechar'
+                on_release: root.dismiss()
+                pos_hint:{'center_x':0.5,'center_y':0.5}
+<inversor>:
+    title:'Configurações do inversor'
+    size_hint:0.25,0.33
     BoxLayout:
-        orientation: 'horizontal'
-        Button:
-            text:'1'
-        Button:
-            text:'b2'
-
-<medidasComp>:
-    title: 'Medidas dos Compressores'
-    size_hint_y: None
-    size_hint_x: 0.4
-    height: 200
-    BoxLayout:
-        orientation: 'horizontal'
-        Button:
-            text:'a3'
-        Button:
-            text:'b4'
+        orientation:'vertical'
+        padding:14
+        spacing:7
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        
+        BoxLayout:
+            orientation:'horizontal'
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            GridLayout:
+                rows:3
+                cols:2
+                padding:7
+                spacing:7
+                #11
+                Label:
+                    text:'ACC'
+                    color: 98/255, 113/255, 142/255
+                #12
+                TextInput:
+                    id:acc
+                    halign:'center'
+                    valigh:'middle'
+                #21
+                Label:
+                    text:'DCC'
+                    color: 98/255, 113/255, 142/255
+                #22
+                TextInput:
+                    id:dcc
+                    halign:'center'
+                    valigh:'middle'
+                #21
+                Label:
+                    text:'Velocidade'
+                    color: 98/255, 113/255, 142/255
+                #22
+                TextInput:
+                    id:velocidade
+                    halign:'center'
+                    valigh:'middle'
+            Slider:
+                size_hint_x:0.5
+                min: 0
+                max: 100
+                step: 1
+                orientation: 'vertical'
+        BoxLayout:
+            orientation:'vertical'
+            padding:14
+            size_hint:0.5,0.5
+            pos_hint:{'center_x':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text:'Fechar'
+                on_release: root.dismiss()        
 
 <medidasVent>:
     title: 'Medidas dos ventiladores'
-    size_hint_y: None
-    size_hint_x: 0.4
-    height: 200
+    size_hint:0.25,0.25
     BoxLayout:
-        orientation: 'horizontal'
-        Button:
-            text:'a3'
-        Button:
-            text:'b5'
+        orientation:'vertical'
+        padding:14
+        spacing: 14
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            orientation:'vertical'
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            GridLayout:
+                cols:2
+                rows:1
+                size_hint_y: 0.33
+                padding:7
+                Label:
+                    text: 'Medidas'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Medida Média'
+                    color: 98/255, 113/255, 142/255
+            GridLayout:
+                cols:2
+                rols:2
+                spacing:7
+                padding: 7                        
+                TempBotao:
+                    text:'Tensão'
+                    #on_release: root.teste()
+                Label:
+                    id: tensaoMVent
+                    text:'110 V'
+                    color: 98/255, 113/255, 142/255
+                TempBotao:
+                    text:'Corrente'
+                    #on_release: root.teste()
+                Label:
+                    text: '10 A'
+                    color: 98/255, 113/255, 142/255
+        BoxLayout:
+            orientation:'vertical'
+            size_hint:0.5,0.5
+            padding:7
+            pos_hint: {'center_x': 0.5, 'center_y':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text:'Fechar'
+                pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                on_release: root.dismiss()
+            
+            
+<comandoComp>:
+    title: 'Comandos dos compressores'
+    size_hint:0.5,0.35
+    BoxLayout:
+        orientation:'horizontal'
+        padding:7
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
+        GridLayout:
+            rows:2
+            cols:3
+            spacing: [14,14]
+            #11
+            BoxLayout:
+                orientation:'vertical'
+                padding:7
+                canvas:
+                    Color:
+                        rgb:203/255, 208/255, 219/255
+                    Rectangle:
+                        size: self.width+3,self.height+3
+                        pos: self.x-3,self.y-3
+                Label:
+                    text:'Comando dos compressores'
+                    color: 98/255, 113/255, 142/255
+                BoxLayout:
+                    orientation:'horizontal'
+                    CheckBox:
+                        id: hermetico
+                        color: 98/255, 113/255, 142/255
+                        group: 'compressores'
+                    Label:
+                        text:'Hermético'
+                        color: 98/255, 113/255, 142/255
+                    CheckBox:
+                        id: scroll
+                        color: 98/255, 113/255, 142/255
+                        group: 'compressores'
+                    Label:
+                        text:'Scroll'
+                        color: 98/255, 113/255, 142/255
+
+            #12
+            BoxLayout:
+                orientation:'vertical'
+                spacing: 7
+                padding:7
+                canvas:
+                    Color:
+                        rgb:203/255, 208/255, 219/255
+                    Rectangle:
+                        size: self.width+3,self.height+3
+                        pos: self.x-3,self.y-3
+                Label:
+                    text:'Comandos do Umidificador'
+                    color: 98/255, 113/255, 142/255
+                TempBotao:
+                    text:'Ligar'
+                TempBotao:
+                    text:'Desligar' 
+            #13
+            BoxLayout:
+                orientation:'vertical'
+                spacing: 7
+                padding:7
+                canvas:
+                    Color:
+                        rgb:203/255, 208/255, 219/255
+                    Rectangle:
+                        size: self.width+3,self.height+3
+                        pos: self.x-3,self.y-3
+                Label:
+                    text:'Aquecedor 1'
+                    color: 98/255, 113/255, 142/255
+                TempBotao:
+                    text:'Ligar'
+                TempBotao:
+                    text:'Desligar' 
+
+            #21
+            BoxLayout:
+                orientation:'vertical'
+                spacing: 7
+                padding:7
+                canvas:
+                    Color:
+                        rgb:203/255, 208/255, 219/255
+                    Rectangle:
+                        size: self.width+3,self.height+3
+                        pos: self.x-3,self.y-3
+                TempBotao:
+                    text:'Ligar'
+                TempBotao:
+                    text:'Desligar'
+
+            #22
+            BoxLayout:
+                orientation:'vertical'
+                spacing: 7
+                canvas:
+                    Color:
+                        rgb:203/255, 208/255, 219/255
+                    Rectangle:
+                        size: self.width+3,self.height+3
+                        pos: self.x-3,self.y-3
+                Label:
+                    text:'Termostato'
+                    color: 98/255, 113/255, 142/255
+                TextInput:
+                    id:txt_terSta
+                    text:'18 ºC'
+                    pos_hint: {'center_x': 0.5}
+                    size_hint_x:0.33
+                    halign:'center'
+                    valign:'middle'
+                Label:
+                    text:'Valor mínimo: 18ºC\nValor Máximo: 30ºC'
+                    color: 98/255, 113/255, 142/255
+            
+            #23
+            BoxLayout:
+                orientation:'vertical'
+                spacing: 7
+                padding:7
+                canvas:
+                    Color:
+                        rgb:203/255, 208/255, 219/255
+                    Rectangle:
+                        size: self.width+3,self.height+3
+                        pos: self.x-3,self.y-3
+                Label:
+                    text:'Aquecedor 1'
+                    color: 98/255, 113/255, 142/255
+                TempBotao:
+                    text:'Ligar'
+                TempBotao:
+                    text:'Desligar' 
+
+<medidasComp>:
+    title: 'Medidas dos Compressores'
+    size_hint:0.25,0.25
+    BoxLayout:
+        orientation:'vertical'
+        padding:14
+        spacing: 14
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            orientation:'vertical'
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            GridLayout:
+                cols:2
+                rows:1
+                size_hint_y: 0.33
+                padding:7
+                Label:
+                    text: 'Medidas'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Medida Média'
+                    color: 98/255, 113/255, 142/255
+            GridLayout:
+                cols:2
+                rols:2
+                spacing:7
+                padding: 7                        
+                TempBotao:
+                    text:'Tensão'
+                    #on_release: root.teste()
+                Label:
+                    id: tensaoMVent
+                    text:'110 V'
+                    color: 98/255, 113/255, 142/255
+                TempBotao:
+                    text:'Corrente'
+                    #on_release: root.teste()
+                Label:
+                    text: '10 A'
+                    color: 98/255, 113/255, 142/255
+        BoxLayout:
+            orientation:'vertical'
+            size_hint:0.5,0.5
+            padding:7
+            pos_hint: {'center_x': 0.5, 'center_y':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text:'Fechar'
+                pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                on_release: root.dismiss()
+
+
+<TempBotao@Button>:
+    background_normal: ''
+    background_color: 133/255, 146/255, 171/255
+    background_down: ''
+    on_press: self.background_color= (85/255, 101/255, 133/255)
+    on_release: self.background_color= (133/255, 146/255, 171/255)

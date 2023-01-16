@@ -11,9 +11,57 @@
         Image:
             source: 'imgs/BackgroundV1.png'
 
-        #Ventiladores Comandos
-
+        #Configurações
+        BoxLayout:
+            orientation:'vertical'
+            pos_hint: {'x':0.68, 'y':0.79}
+            #size: 2*99.84, 2*34.56
+            size_hint: 2*0.065, 3*0.04
+            spacing:7
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+20,self.height+20
+                    pos: self.x-10,self.y-10
+            Label:
+                text:'CONFIGURAÇÕES'
+                color: 98/255, 113/255, 142/255
+                bold: True
+                halign: 'center'
+                valigh: 'middle'
+                font_size:21
+            BoxLayout:
+                orientation:'horizontal'
+                spacing:7
+                Button:
+                    text: 'Modbus'
+                    #pos_hint: {'x':0.68, 'y':0.79}
+                    #size_hint: 0.065, 0.04
+                    background_normal: ''
+                    background_color: 133/255, 146/255, 171/255
+                    background_down: ''
+                    on_press: self.background_color= (85/255, 101/255, 133/255)
+                    on_release: 
+                        self.background_color= (133/255, 146/255, 171/255)
+                        root._ModbusPopup.open()
                     
+                Button:
+                    text: 'Scantime'
+                    #pos_hint: {'x':0.68, 'y':0.79}
+                    #size_hint: 0.065, 0.04
+                    background_normal: ''
+                    background_color: 133/255, 146/255, 171/255
+                    background_down: ''
+                    on_press: self.background_color= (85/255, 101/255, 133/255)
+                    on_release: 
+                        self.background_color= (133/255, 146/255, 171/255)
+                        root._ScanPopup.open()
+            Label:
+                id: conexao
+                text:'DESCONECTADO'
+                color: 98/255, 113/255, 142/255
+        #Ventiladores Comandos
         CheckBox:
             id: checkboxAxial
             color: 98/255, 113/255, 142/255
@@ -62,10 +110,38 @@
             background_color: 133/255, 146/255, 171/255
             background_down: ''
             on_press: self.background_color= (85/255, 101/255, 133/255)
-            on_release: self.background_color= (133/255, 146/255, 171/255)
-
+            on_release: 
+                self.background_color= (133/255, 146/255, 171/255)
+                root._medidasVent.open()
         #Compressores
-
+        BoxLayout:
+            orientation:'vertical'
+            padding:7
+            pos_hint:{'center_x':0.176,'center_y':0.15}
+            size_hint:0.08,0.05
+            canvas:
+                Color:
+                    rgb:133/255, 146/255, 171/255
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            Label:
+                text:'DESLIGADO'
+                bold: True
+        BoxLayout:
+            orientation:'vertical'
+            padding:7
+            pos_hint:{'center_x':0.176,'center_y':0.28}
+            size_hint:0.08,0.05
+            canvas:
+                Color:
+                    rgb:133/255, 146/255, 171/255
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            Label:
+                text:'LIGADO'
+                bold: True
         CheckBox:
             id: scroll
             color: 98/255, 113/255, 142/255
@@ -80,7 +156,10 @@
             background_color: 133/255, 146/255, 171/255
             background_down: ''
             on_press: self.background_color= (85/255, 101/255, 133/255)
-            on_release: self.background_color= (133/255, 146/255, 171/255)
+            on_release:
+                self.background_color= (133/255, 146/255, 171/255)
+                root._comandoComp.open()
+
         Button:
             text: 'Medidas'
             size_hint: 0.065, 0.04
@@ -89,8 +168,9 @@
             background_color: 133/255, 146/255, 171/255
             background_down: ''
             on_press: self.background_color= (85/255, 101/255, 133/255)
-            on_release: self.background_color= (133/255, 146/255, 171/255)
-            
+            on_release: 
+                self.background_color= (133/255, 146/255, 171/255)
+                root._medidasComp.open()
         CheckBox:
             color: 98/255, 113/255, 142/255
             size_hint: 0.05,0.05
@@ -98,31 +178,31 @@
             group: 'compressores'
         
         #Valvulas
-
         Image:
             id: xv1
             source: 'imgs/ValvulaAzul.png'
             size_hint: 0.12,0.12
-            pos: 352,250
+            #pos: 352,250
+            pos_hint: {'x':0.2280, 'y':0.288}
             #-30,+24
         Image:
             id: xv2
             source: 'imgs/ValvulaBranca.png'
             size_hint: 0.12,0.12
-            pos: 352,165
-            #+15
+            #pos: 352,165
+            pos_hint: {'x':0.2280, 'y':0.19}
         Image:
             id: xv3
             source: 'imgs/ValvulaAzul.png'
             size_hint: 0.12,0.12
-            pos: 352,106
-
+           # pos: 352,106
+            pos_hint: {'x':0.2280, 'y':0.123}
         Image:
             id: xv4
             source: 'imgs/ValvulaBranca.png'
             size_hint: 0.12,0.12
-            pos: 352,22
-        
+            #pos: 352,22
+            pos_hint: {'x':0.2280, 'y':0.025}
         Image:
             id: xv5
             source: 'imgs/ValvulaAzul.png'
@@ -132,13 +212,13 @@
 
 
         #Sensores
-
         Label:
             id: pit1
             color: 98/255, 113/255, 142/255
             text: '20 Pa'
             size_hint: 0.065, 0.04
-            pos: 560,310
+            #pos: 560,310
+            pos_hint: {'x':0.36, 'y':0.36}
             font_size: 21
 
         Label:
@@ -146,7 +226,8 @@
             color: 98/255, 113/255, 142/255
             text: '58 ºC'
             size_hint: 0.065, 0.04
-            pos: 725,310
+            #pos: 725,310
+            pos_hint: {'x':0.47, 'y':0.36}
             font_size: 21
 
         Label:
@@ -154,7 +235,8 @@
             color: 98/255, 113/255, 142/255
             text: '20 Pa'
             size_hint: 0.065, 0.04
-            pos: 560,225
+            #pos: 560,225
+            pos_hint: {'x':0.36, 'y':0.26}
             font_size: 21
 
         Label:
@@ -162,7 +244,8 @@
             color: 98/255, 113/255, 142/255
             text: '58 ºC'
             size_hint: 0.065, 0.04
-            pos: 725,225
+            #pos: 725,225
+            pos_hint: {'x':0.47, 'y':0.26}
             font_size: 21
 
         Label:
@@ -171,6 +254,7 @@
             text: '20 Pa'
             size_hint: 0.065, 0.04
             pos: 375,630
+            pos_hint: {'x':0.24, 'y':0.73}
             font_size: 21
 
         Label:
@@ -178,7 +262,8 @@
             color: 98/255, 113/255, 142/255
             text: '20 Pa'
             size_hint: 0.065, 0.04
-            pos: 830,630
+            pos_hint: {'x':0.55, 'y':0.73}
+            #pos: 830,630
             font_size: 21
 
         Label:
@@ -186,7 +271,8 @@
             color: 98/255, 113/255, 142/255
             text: '100 m/s'
             size_hint: 0.065, 0.04
-            pos: 830,660
+            #pos: 830,660
+            pos_hint: {'x':0.55, 'y':0.76}
             font_size: 21
 
         Label:
@@ -194,14 +280,16 @@
             color: 98/255, 113/255, 142/255
             text: '20ºC'
             size_hint: 0.065, 0.04
-            pos: 830,690
+            #pos: 830,690
+            pos_hint: {'x':0.55, 'y':0.79}
             font_size: 21
 
         #Hélices
-
         Helices:
             id: hel0
-            pos:-589,85 #-534,75
+            #pos:-589,85 #-534,75
+            pos_hint: {'x':-0.3835, 'y':0.1}
+            
             canvas.before:
                 PushMatrix
                 Rotate:
@@ -213,12 +301,13 @@
 
             Image:
                 id: helice0
-                source: ''
+                source: 'imgs/vazio.png'
                 size_hint: 0.12,0.12
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
         Helices:
-            pos:-593,255
+            #pos:-593,255
+            pos_hint: {'x':-0.38, 'y':0.296}
             id: hel1
             canvas.before:
                 PushMatrix
@@ -231,12 +320,11 @@
 
             Image:
                 id: helice1
-                source: ''
+                source: 'imgs/vazio.png'
                 size_hint: 0.12,0.12
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
         #Venezianas
-
         Slider:
             min: -90
             max: 0
@@ -244,14 +332,16 @@
             orientation: 'horizontal'
             color: 1, 1, 1
             size_hint: 0.1,0.1
-            pos: 500, 550
+            #pos: 500, 550
+            pos_hint: {'center_x':0.375,'center_y':0.69}
             on_value: root.venezianas(*args)
 
         Image:
             id: veneziana1
             source: 'imgs/FlapFechado.png'
             keep_ratio: False
-            pos: 565.5,633.75
+            #pos: 565.5,633.75
+            pos_hint:{'x':0.3683, 'y':0.7339}
             size_hint: 0.003,0.040
             angle: 0
             allow_stretch: True
@@ -267,7 +357,8 @@
             id: veneziana2
             source: 'imgs/FlapFechado.png'
             size_hint: 0.003,0.040
-            pos: 565.5,668.55
+            #pos: 565.5,668.55
+            pos_hint:{'x':0.3683, 'y':0.7739}
             allow_stretch: True
             keep_ratio: False
             angle: 0
@@ -283,7 +374,8 @@
             id: veneziana3
             source: 'imgs/FlapFechado.png'
             size_hint: 0.003,0.040
-            pos: 565.5,703.5 
+            #pos: 565.5,703.5 
+            pos_hint: {'x':0.3683, 'y':0.8139}
             allow_stretch: True
             keep_ratio: False
             angle: 0
@@ -298,8 +390,8 @@
         Button:
             text: 'Medidas'
             size_hint: 0.065, 0.04
-            pos: 525, 525
-            #pos_hint: {'x':0.045, 'y':0.159}
+            #pos: 525, 525
+            pos_hint: {'x':0.345, 'y':0.62}
             background_normal: ''
             background_color: 133/255, 146/255, 171/255
             background_down: ''
