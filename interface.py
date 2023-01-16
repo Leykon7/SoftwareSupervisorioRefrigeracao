@@ -9,6 +9,7 @@ from kivy.core.window import Window
 from threading import Thread
 from time import sleep
 import datetime
+import random
 
 class Interface(BoxLayout):
     """
@@ -16,27 +17,37 @@ class Interface(BoxLayout):
     """
     _updateThread = None
     _updateWidgets = True
-    _tags = {}
+    _tags = {} #teste
+    _tags4X = {}
+    _tagsFP = {}
 
-    def __init__(self, **kwargs):
+    def __init__(self,**kwargs):
         super().__init__()
+        #Pega info
         self._scan_time = kwargs.get('scan_time')
         self._serverIP = kwargs.get('server_ip')
         self._port = kwargs.get('server_port')
+
+        #Cliente Modbus
+        self._ClienteModbus = ModbusClient(host=self._serverIP, port=self._port)
+
+        #Leituras
+        self._medidas = {}
+        self._medidas['Timestamp']=None
+        self._medidas['Valores']={}
+
+        ##Dá cor e salva no dict _tags
+        for key,value in kwargs.get('modbusEnd').items():
+            if key == 'fornalha':
+                cor_plot = (1,0,0,1)
+            else:
+                cor_plot =(random.random(),random.random(),random.random(),1)
+
+            self._tags[key] = {'endereco': value, 'color': cor_plot}
+
+        #Popups
         self._ModbusPopup = popups.ModbusPopup(self._serverIP,self._port)
         self._ScanPopup = popups.ScanPopup(self._scan_time)
-
-        self._ClienteModbus = ModbusClient(host=self._serverIP, port=self._port)
-        # self._medidas = {}
-        # self._medidas['Timestamp']=None
-        # self._medidas['Valores']=None
-        # for key,value in kwargs.get('modbus_enderecos').items():
-        #     if key == 'fornalha':
-        #         cor_plot = (1,0,0,1)
-        #     else:
-        #         cor_plot =(0,1,0,1)
-        #     self._tags[key] = {'endereco': value, 'color': cor_plot}
-
         self._comandoVent = popups.comandoVent()
         self._medidasVent = popups.medidasVent()
         self._medidasComp = popups.medidasComp()
@@ -85,10 +96,25 @@ class Interface(BoxLayout):
     def lerDados(self):
         """
         Metodo de leitura de dados pelo protocolo modbus
+        Atualiza o atributo medidas
         """
-        # self._medidas['Timestamp'] = datetime.now()
-        # for key,value in self._tags.items():
-        #     self._medidas['valores'][key] = self._ClienteModbus.read_holding_register(value['endereco'],1)[0]
+        self._medidas['Timestamp'] = datetime.now()
+        for key,value in self._tags.items():
+             self._medidas['valores'][key] = self._ClienteModbus.read_holding_register(value['endereco'],1)[0]
+             
+        #Exemplo de leitura FP
+        """
+        if tipo == 1:  #Float
+            leitura = self._cliente.read_holding_registers(addr, 2)
+            decoder = BinaryPayloadDecoder.fromRegisters(leitura, Byteorder=Endian.Big, Wordorder=Endian.Little)
+            return decoder.decode_32bit_float()
+
+        """
+        #Exemplo de leitura 4X
+        """"
+        #return self._cliente.read_holding_registers(addr,1)[0]
+
+        """
 
     def atualizaInterface(self):
         """

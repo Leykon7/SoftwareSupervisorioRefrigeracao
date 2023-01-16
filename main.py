@@ -11,8 +11,7 @@ class Principal(App):
         """
         Método para construção do aplicativo com base no widget criado
         """
-        self._widget = Interface(scan_time=1000,server_ip='127.0.0.1', server_port=502)
-        #modbus_enderecos = {'fornalha':1000, 'nafta': 1001}
+        self._widget = Interface(scan_time=1000,server_ip='127.0.0.1', server_port=502, modbusEnd = {'fornalha':1000, 'nafta': 1001},
         modbus_enderecosFP = {
             've.temp_r':700,
             've.temp_s':702,
@@ -36,7 +35,7 @@ class Principal(App):
             've.sp_pid':1302,
             've.sp_termo':1338,
             've.torque_axial1':1424,
-            've.torque_radial1 ':1422}
+            've.torque_radial1 ':1422},
         modbus_enderecos4X={
             've.frequencia' :630,
             've.tipo_motor' :78,
@@ -173,13 +172,133 @@ class Principal(App):
             've.habilita.3':1330,
             've.valv_inversor_pid.0':1328,
             've.xv5.7':1328,
-            've.comutacao':1420}
+            've.comutacao':1420})
+        modbus_Atuadores = {}
+        endTelaFP = {
+            've.encoder':884,
+            've.tit01':1220,
+            've.pit01':1224,
+            've.tit02':1218,
+            've.pit02':1222,
+            've.pit03':1226,
+            've.vazao':714,
+            've.velocidade':712,
+            've.temperatura':710,
+            've.torque_axial1':1424,
+            've.torque_radial1 ':1422
+        }
+        """
+        ve.encoder_radial	##Frequência de rotação ventilador radial			
+        ve.torque_radial	##Torque ventilador radial			
+        ve.encoder_axial	##Frequência de rotação ventilador axial			
+        ve.torque_axial	    ##Torque ventilador axial			
+        ve.pit01	        ##Pressão Tubo Azul (psi)			
+        ve.pit02	        ##Pressão Tubo Vermelho (psi)			
+        ve.pit03	        ##Pressão do ar (entrada) mmH2O			
+        ve.tit01	        ##Temperatura Tubo Azul			
+        ve.tit02	        ##Temperatura Tubo Vermelho (trocador de calor)			
+        ve.vazao	        ##Vazão do ar (saída)			
+        ve.velocidade	    ##Velocidade do ar (saída)			
+        ve.temperatura	    ##Temperatura do ar (saída)	
+        """
+        endTempFP ={
+            've.temp_r':700,
+            've.temp_s':702,
+            've.temp_t':704,
+            've.temp_carc':706
+        }
+        """
+        ve.temp_r	    ##Temperatura Enrolamento r			
+        ve.temp_s	    ##Temperatura Enrolamento s			
+        ve.temp_t   	##Temperatura Enrolamento t			
+        ve.temp_carc	##Temperatura Carcaça			
+        """
+        endAqueUmidTerm4X={
+            've.liga_umi.2':1329, 
+            've.desliga_umi.3':1329,
+            've.liga_aq1.4':1329,
+            've.desliga_aq1.5':1329,
+            've.liga_aq2.6':1329,
+            've.desliga_aq2.7':1329,
+            've.sp_termo':1338
+        }
+        """
+        ve.liga_umi         0   ##Umidificador
+        ve.desliga_umi      1
+        ve.liga_aq1	        0   ##Aquecedor 1
+        ve.desliga_aq1	    0   
+        ve.liga_aq2	        0   ##Aquecedor 2
+        ve.desliga_aq2	    0
+        ve.sp_termo             ##Termostato
+        """
+        endComp4X = {
+            've.sel_tipo_compressor.1':1328,
+            've.liga_compressor.4':1328,
+            've.desliga_compressor.0' :1329,
+            've.velocidade_scroll':1236
+        }
+        """
+        	                            Scroll	Hermético		
+            ve.sel_tipo_compressor  #	  0	        1		
+            ve.desliga_compressor	#     0			
+            ve.liga_compressor	    #     1			
+            ve.velocidade_scroll	#Velocidade do compressor Scroll
+        """
+        endMotor4X = {
+            've.atv31' :1312,
+            've.ats48' :1316,
+            've.tesys' :1319,
+            've.atv31_velocidade' :1313,
+            've.atv31_acc' :1314,
+            've.atv31_dcc' :1315,
+            've.ats48_acc' :1317,
+            've.ats48_dcc' :1318,
+            've.sel_tipo_ventilador.2':1328,
+            've.sel_rendimento.5':1328
+        }
+        """
+        ve.acc	                  ##Tempo de aceleração inversor			
+        ve.dcc	                  ##Tempo de desaceleração inversor			
+        ve.atv31_velocidade	      ## 0 a 60			
+                                    Axial	Radial		
+        ve.sel_tipo_ventilador	  ##  1     	0		
+                                    Alto	Convencional		
+        ve.sel_rendimento	      ##  0            1		
+        """
+        endPartida4X = {
+            've.sel_driver' :1324,
+            've.indica_driver' :1216,
+            've.atv31' :1312,
+            've.ats48' :1316,
+            've.tesys' :1319,
+        }
+        """
+        ve.sel_driver	##Soft	        1		
+                          Inversor	    2		
+                          Direta	    3		
+                                        Liga    Desliga	Reset
+        ve.ats48	  ##Liga Soft	     1	       0	 2
+        ve.atv31	  ##Liga Inversor	 1	       0	 2
+        ve.tesys	  ##Liga Direta	     1	       0	 2
+
+        ve.indica_driver ##Indica driver selecionado?
+        """
+        endVeneziana = {
+            've.sel_pid' :1332,
+            've.mv_escreve':1310
+        }
+        """
+        	                Automático	Manual
+            ve.sel_pid	        0	      1
+            ve.fv01	        MV
+            ve.mv_escreve  escrever no MV?
+        """
         return self._widget
 
 if __name__ == '__main__':
-    #Window.size=(1920, 1080)
+    Window.size=(1920, 1080)
     #Window.resizable=False
-    Window.fullscreen = 'auto'
+    #Window.fullscreen = 'auto'
     Builder.load_string(open("interface.kv",encoding="utf-8").read(),rulesonly=True)
     Builder.load_string(open("popups.kv",encoding="utf-8").read(),rulesonly=True)
     Principal().run()
