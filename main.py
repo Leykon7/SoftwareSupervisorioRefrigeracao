@@ -11,7 +11,7 @@ class Principal(App):
         """
         Método para construção do aplicativo com base no widget criado
         """
-        self._widget = Interface(scan_time=1000,server_ip='127.0.0.1', server_port=502, modbusEnd = {'fornalha':1000, 'nafta': 1001},
+        self._widget = Interface(scan_time=1000,server_ip='10.15.20.17', server_port=10012, modbusEnd = {'fornalha':1000, 'nafta': 1001},
         modbus_enderecosFP = {
             've.temp_r':700,
             've.temp_s':702,
@@ -172,8 +172,20 @@ class Principal(App):
             've.habilita.3':1330,
             've.valv_inversor_pid.0':1328,
             've.xv5.7':1328,
-            've.comutacao':1420})
-        modbus_Atuadores = {}
+            've.comutacao':1420},
+        endTelaFP = {
+            've.encoder':884,
+            've.tit01':1220,
+            've.pit01':1224,
+            've.tit02':1218,
+            've.pit02':1222,
+            've.pit03':1226,
+            've.vazao':714,
+            've.velocidade':712,
+            've.temperatura':710,
+            've.torque_axial1':1424,
+            've.torque_radial1 ':1422
+        })
         endTelaFP = {
             've.encoder':884,
             've.tit01':1220,
@@ -293,12 +305,15 @@ class Principal(App):
             ve.fv01	        MV
             ve.mv_escreve  escrever no MV?
         """
+        """
+        Como controlar a veneziana, como funcionam os endereços com ponto.
+        """
         return self._widget
 
 if __name__ == '__main__':
-    Window.size=(1920, 1080)
+    #Window.size=(1080, 720)
     #Window.resizable=False
-    #Window.fullscreen = 'auto'
+    Window.fullscreen = 'auto'
     Builder.load_string(open("interface.kv",encoding="utf-8").read(),rulesonly=True)
     Builder.load_string(open("popups.kv",encoding="utf-8").read(),rulesonly=True)
     Principal().run()

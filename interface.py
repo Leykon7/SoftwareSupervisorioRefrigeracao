@@ -8,8 +8,12 @@ from pyModbusTCP.client import ModbusClient
 from kivy.core.window import Window
 from threading import Thread
 from time import sleep
-import datetime
+from datetime import datetime
 import random
+from pymodbus.constants import Endian
+from pymodbus.payload import BinaryPayloadDecoder
+from pymodbus.payload import BinaryPayloadBuilder
+
 
 class Interface(BoxLayout):
     """
@@ -37,13 +41,17 @@ class Interface(BoxLayout):
         self._medidas['Valores']={}
 
         ##Dá cor e salva no dict _tags
-        for key,value in kwargs.get('modbusEnd').items():
+        """ for key,value in kwargs.get('modbusEnd').items():
             if key == 'fornalha':
                 cor_plot = (1,0,0,1)
             else:
                 cor_plot =(random.random(),random.random(),random.random(),1)
 
-            self._tags[key] = {'endereco': value, 'color': cor_plot}
+            self._tags[key] = {'endereco': value, 'color': cor_plot} """
+
+        for key, value in kwargs.get('endTelaFP').items():
+            cor_plot=(random.random(),random.random(),random.random(),1)
+            self._tagsFP[key] = {'endereco': value, 'color': cor_plot}
 
         #Popups
         self._ModbusPopup = popups.ModbusPopup(self._serverIP,self._port)
@@ -53,7 +61,7 @@ class Interface(BoxLayout):
         self._medidasComp = popups.medidasComp()
         self._comandoComp = popups.comandoComp()
         #self._inversor = popups.inversor()
-    
+    _teste = False
     def iniciaColetaDados(self,ip,port):
         """
         Método para configurar ip e porta e inicializar a thread de leitura dos dados
@@ -66,10 +74,10 @@ class Interface(BoxLayout):
             Window.set_system_cursor('wait')
             self._ClienteModbus.open()
             Window.set_system_cursor('arrow')
-            if self._ClienteModbus.is_open():
+            if self._ClienteModbus.is_open:
                 self._updateThread = Thread(target=self.atualizador)
                 self._updateThread.start()
-                self.ids.conexa.text = 'CONECTADO'
+                self.ids.conexao.text = 'CONECTADO'
                 self._ModbusPopup.dismiss()
             else:
                 self._ModbusPopup.porInfo('FALHA NA CONEXÃO!')
@@ -97,10 +105,18 @@ class Interface(BoxLayout):
         """
         Metodo de leitura de dados pelo protocolo modbus
         Atualiza o atributo medidas
+
+        self._medidas['Timestamp'] = datetime.now()
+        for key,value in self._tagsFP.items():
+             self._medidas['valores'][key] = self._ClienteModbus.read_holding_register(value['endereco'],1)[0]
+             decoder = BinaryPayloadDecoder.fromRegisters(leitura, Byteorder=Endian.Big, Wordorder=Endian.Little)
         """
         self._medidas['Timestamp'] = datetime.now()
-        for key,value in self._tags.items():
-             self._medidas['valores'][key] = self._ClienteModbus.read_holding_register(value['endereco'],1)[0]
+        for key,value in self._tagsFP.items():
+            leitura = self._ClienteModbus.read_holding_registers(value['endereco'],2)
+            decoder = BinaryPayloadDecoder.fromRegisters(leitura, byteorder=Endian.Big, wordorder=Endian.Little)
+            self._medidas['Valores'][key] = decoder.decode_32bit_float()
+            #self._ClienteModbus.read_holding_register(value['endereco'],2)[0]
              
         #Exemplo de leitura FP
         """
@@ -120,10 +136,13 @@ class Interface(BoxLayout):
         """
         Método que atualiza a interface gráfica a partir dos dados lidos
         """
+        self.ids.pit1.text =str((self._medidas['Valores']['ve.pit01'])/10)+'Psi'
+        self.ids.pit2.text =str((self._medidas['Valores']['ve.pit02'])/10)+'Psi'
+        self.ids.pit3.text =str((self._medidas['Valores']['ve.pit03'])/10)+'Psi'
+        self.ids.tit1.text =str((self._medidas['Valores']['ve.tit01'])/10)+'ºC'
+        self.ids.tit1.text =str((self._medidas['Valores']['ve.tit02'])/10)+'ºC'
         # for key,value in self._tags.items():
         #         self.ids[key].text = str(self.medidas['values'][key])+'ºC'
-
-
 
     def venezianas(self, *args):
         self.ids.veneziana1.angle = args[1]
