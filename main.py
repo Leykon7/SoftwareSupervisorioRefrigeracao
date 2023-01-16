@@ -11,31 +11,29 @@ class Principal(App):
         """
         Método para construção do aplicativo com base no widget criado
         """
-        self._widget = Interface(scan_time=1000,server_ip='10.15.20.17', server_port=10012, modbusEnd = {'fornalha':1000, 'nafta': 1001},
-        modbus_enderecosFP = {
-            've.temp_r':700,
-            've.temp_s':702,
-            've.temp_t':704,
-            've.temp_carc':706,
-            've.vazao':714,
-            've.temperatura':710,
-            've.velocidade':712,
-            've.mv_le':614,
-            've.mv_le':814,
+        self._widget = Interface(scan_time=1000,server_ip='10.15.20.17', server_port=10012, 
+        endTelaFP = {
             've.encoder':884,
-            've.tit01':1220,
-            've.pit01':1224,
-            've.tit02':1218,
-            've.pit02':1222,
-            've.pit03':1226,
-            've.p':1304,
-            've.i':1306,
-            've.d':1308,
-            've.mv_escreve':1310,
-            've.sp_pid':1302,
-            've.sp_termo':1338,
+            've.tit01':1220,            #
+            've.pit01':1224,            #
+            've.tit02':1218,            #
+            've.pit02':1222,            #
+            've.pit03':1226,            #
+            've.vazao':714,             #
+            've.velocidade':712,        #
+            've.temperatura':710,       #
             've.torque_axial1':1424,
-            've.torque_radial1 ':1422},
+            've.torque_radial1 ':1422
+        }, endValvulas4X ={
+            've.xv_scroll.0' :1230,
+            've.xv_hermetico.1' :1230
+        },endPartida4X = {
+            've.sel_driver' :1324,
+            've.indica_driver' :1216,
+            've.atv31' :1312,
+            've.ats48' :1316,
+            've.tesys' :1319,
+        })
         modbus_enderecos4X={
             've.frequencia' :630,
             've.tipo_motor' :78,
@@ -172,47 +170,20 @@ class Principal(App):
             've.habilita.3':1330,
             've.valv_inversor_pid.0':1328,
             've.xv5.7':1328,
-            've.comutacao':1420},
-        endTelaFP = {
-            've.encoder':884,
-            've.tit01':1220,
-            've.pit01':1224,
-            've.tit02':1218,
-            've.pit02':1222,
-            've.pit03':1226,
-            've.vazao':714,
-            've.velocidade':712,
-            've.temperatura':710,
-            've.torque_axial1':1424,
-            've.torque_radial1 ':1422
-        })
-        endTelaFP = {
-            've.encoder':884,
-            've.tit01':1220,
-            've.pit01':1224,
-            've.tit02':1218,
-            've.pit02':1222,
-            've.pit03':1226,
-            've.vazao':714,
-            've.velocidade':712,
-            've.temperatura':710,
-            've.torque_axial1':1424,
-            've.torque_radial1 ':1422
-        }
-        """
-        ve.encoder_radial	##Frequência de rotação ventilador radial			
-        ve.torque_radial	##Torque ventilador radial			
-        ve.encoder_axial	##Frequência de rotação ventilador axial			
-        ve.torque_axial	    ##Torque ventilador axial			
-        ve.pit01	        ##Pressão Tubo Azul (psi)			
-        ve.pit02	        ##Pressão Tubo Vermelho (psi)			
-        ve.pit03	        ##Pressão do ar (entrada) mmH2O			
-        ve.tit01	        ##Temperatura Tubo Azul			
-        ve.tit02	        ##Temperatura Tubo Vermelho (trocador de calor)			
-        ve.vazao	        ##Vazão do ar (saída)			
-        ve.velocidade	    ##Velocidade do ar (saída)			
-        ve.temperatura	    ##Temperatura do ar (saída)	
-        """
+            've.comutacao':1420}
+        endFPrestantes = {
+            've.temp_r':700,
+            've.temp_s':702,
+            've.temp_t':704,
+            've.temp_carc':706,
+            've.mv_le':614,
+            've.mv_le':814,
+            've.p':1304,
+            've.i':1306,
+            've.d':1308,
+            've.mv_escreve':1310,
+            've.sp_pid':1302,
+            've.sp_termo':1338}
         endTempFP ={
             've.temp_r':700,
             've.temp_s':702,
@@ -277,13 +248,7 @@ class Principal(App):
                                     Alto	Convencional		
         ve.sel_rendimento	      ##  0            1		
         """
-        endPartida4X = {
-            've.sel_driver' :1324,
-            've.indica_driver' :1216,
-            've.atv31' :1312,
-            've.ats48' :1316,
-            've.tesys' :1319,
-        }
+        
         """
         ve.sel_driver	##Soft	        1		
                           Inversor	    2		
@@ -305,15 +270,26 @@ class Principal(App):
             ve.fv01	        MV
             ve.mv_escreve  escrever no MV?
         """
+        
         """
-        Como controlar a veneziana, como funcionam os endereços com ponto.
+        Como controlar a veneziana
+        como funcionam os endereços com ponto
+        como funcionam motores
+        que é temperatura do enrolamento
+        como funciona o PID
+        aquecedores ligam ao mesmo tempo
+        velocidade do scroll é para controlar(ve.velocidade_scroll)
+        que é o rendimento do motor
+        Como funciona soft start
+        A frequencia ve.encoder serve para os dois motores
+        ver grandezas eletricas
         """
         return self._widget
 
 if __name__ == '__main__':
-    #Window.size=(1080, 720)
+    Window.size=(1080, 720)
     #Window.resizable=False
-    Window.fullscreen = 'auto'
+    #Window.fullscreen = 'auto'
     Builder.load_string(open("interface.kv",encoding="utf-8").read(),rulesonly=True)
     Builder.load_string(open("popups.kv",encoding="utf-8").read(),rulesonly=True)
     Principal().run()

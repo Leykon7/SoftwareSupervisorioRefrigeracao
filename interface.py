@@ -22,8 +22,8 @@ class Interface(BoxLayout):
     _updateThread = None
     _updateWidgets = True
     _tags = {} #teste
-    _tags4X = {}
-    _tagsFP = {}
+    _tagsValvula4X = {}
+    _tagsTelaFP = {}
 
     def __init__(self,**kwargs):
         super().__init__()
@@ -36,9 +36,11 @@ class Interface(BoxLayout):
         self._ClienteModbus = ModbusClient(host=self._serverIP, port=self._port)
 
         #Leituras
-        self._medidas = {}
-        self._medidas['Timestamp']=None
-        self._medidas['Valores']={}
+        self._medidasTela = {}
+        self._medidasTela['Timestamp']=None
+        self._medidasTela['Valores']={}
+        self._valvulas = {}
+        self._valvulas['Leitura']={}
 
         ##Dá cor e salva no dict _tags
         """ for key,value in kwargs.get('modbusEnd').items():
@@ -51,14 +53,17 @@ class Interface(BoxLayout):
 
         for key, value in kwargs.get('endTelaFP').items():
             cor_plot=(random.random(),random.random(),random.random(),1)
-            self._tagsFP[key] = {'endereco': value, 'color': cor_plot}
+            self._tagsTelaFP[key] = {'endereco': value, 'color': cor_plot}
+
+        for key, value in kwargs.get('endValvulas4X').items():
+            self._tagsValvula4X[key] = value
 
         #Popups
         self._ModbusPopup = popups.ModbusPopup(self._serverIP,self._port)
         self._ScanPopup = popups.ScanPopup(self._scan_time)
         self._comandoVent = popups.comandoVent()
-        self._medidasVent = popups.medidasVent()
-        self._medidasComp = popups.medidasComp()
+        self._medidasTelaVent = popups.medidasVent()
+        self._medidasTelaComp = popups.medidasComp()
         self._comandoComp = popups.comandoComp()
         #self._inversor = popups.inversor()
     _teste = False
@@ -99,32 +104,29 @@ class Interface(BoxLayout):
             self._ClienteModbus.close()
             print('Erro', e.args)
 
-
-
     def lerDados(self):
         """
         Metodo de leitura de dados pelo protocolo modbus
         Atualiza o atributo medidas
-
-        self._medidas['Timestamp'] = datetime.now()
-        for key,value in self._tagsFP.items():
-             self._medidas['valores'][key] = self._ClienteModbus.read_holding_register(value['endereco'],1)[0]
-             decoder = BinaryPayloadDecoder.fromRegisters(leitura, Byteorder=Endian.Big, Wordorder=Endian.Little)
         """
-        self._medidas['Timestamp'] = datetime.now()
-        for key,value in self._tagsFP.items():
+        #Dados da tela
+        self._medidasTela['Timestamp'] = datetime.now()
+        for key,value in self._tagsTelaFP.items():
             leitura = self._ClienteModbus.read_holding_registers(value['endereco'],2)
             decoder = BinaryPayloadDecoder.fromRegisters(leitura, byteorder=Endian.Big, wordorder=Endian.Little)
-            self._medidas['Valores'][key] = decoder.decode_32bit_float()
-            #self._ClienteModbus.read_holding_register(value['endereco'],2)[0]
-             
+            self._medidasTela['Valores'][key] = decoder.decode_32bit_float()
+            
+        #Leitura das Valvulas
+        for key, value in self._tagsValvula4X.items():
+            leitura = self._ClienteModbus.read_holding_registers(value,1)[0]
+            self._valvulas['Leitura'][key] = leitura
+
         #Exemplo de leitura FP
         """
         if tipo == 1:  #Float
             leitura = self._cliente.read_holding_registers(addr, 2)
-            decoder = BinaryPayloadDecoder.fromRegisters(leitura, Byteorder=Endian.Big, Wordorder=Endian.Little)
+            decoder = BinaryPayloadDecoder.fromRegisters(leitura, byteorder=Endian.Big, wordorder=Endian.Little)
             return decoder.decode_32bit_float()
-
         """
         #Exemplo de leitura 4X
         """"
@@ -136,11 +138,29 @@ class Interface(BoxLayout):
         """
         Método que atualiza a interface gráfica a partir dos dados lidos
         """
-        self.ids.pit1.text =str((self._medidas['Valores']['ve.pit01'])/10)+'Psi'
-        self.ids.pit2.text =str((self._medidas['Valores']['ve.pit02'])/10)+'Psi'
-        self.ids.pit3.text =str((self._medidas['Valores']['ve.pit03'])/10)+'Psi'
-        self.ids.tit1.text =str((self._medidas['Valores']['ve.tit01'])/10)+'ºC'
-        self.ids.tit1.text =str((self._medidas['Valores']['ve.tit02'])/10)+'ºC'
+        #Medidas da tela
+        self.ids.pit1.text =str((self._medidasTela['Valores']['ve.pit01'])/10)+' Psi'
+        self.ids.pit2.text =str((self._medidasTela['Valores']['ve.pit02'])/10)+' Psi'
+        self.ids.pit3.text =str((self._medidasTela['Valores']['ve.pit03'])/10)+' Psi'
+        self.ids.tit1.text =str((self._medidasTela['Valores']['ve.tit01'])/10)+' ºC'
+        self.ids.tit2.text =str((self._medidasTela['Valores']['ve.tit02'])/10)+' ºC'
+        self.ids.tit3.text =str(round(self._medidasTela['Valores']['ve.temperatura'],2))+' ºC'
+        self.ids.vazao.text =str(self._medidasTela['Valores']['ve.vazao'])+' m³/h'
+        self.ids.vel.text =str(self._medidasTela['Valores']['ve.velocidade'])+' m/s'
+
+        #Valvulas
+        if self._valvulas['Leituras']['ve.xv_scroll.0'] == 0:
+            self.ids.xv1.source = 'imgs/ValvulaAzul.png'
+            self.ids.xv3.source = 'imgs/ValvulaAzul.png'
+        elif self._valvulas['Leituras']['ve.xv_hermetico.1']==1:
+            self.ids.xv2.source = 'imgs/ValvulaAzul.png'
+            self.ids.xv4.source = 'imgs/ValvulaAzul.png'
+        else:
+            self.ids.xv1.source = 'imgs/ValvulaBranca.png'
+            self.ids.xv3.source = 'imgs/ValvulaBranca.png'
+            self.ids.xv2.source = 'imgs/ValvulaBranca.png'
+            self.ids.xv4.source = 'imgs/ValvulaBranca.png'
+        
         # for key,value in self._tags.items():
         #         self.ids[key].text = str(self.medidas['values'][key])+'ºC'
 
