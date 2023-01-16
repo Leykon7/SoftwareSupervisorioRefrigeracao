@@ -181,19 +181,22 @@
             #22
             TempBotao:
                 text: 'Tesys Direta'
+                on_release: root.self.interface.Partida(3)
             #31 
             TempBotao:
                 text:'Desligar'
             #32
             TempBotao:
                 text: 'ATV31 Inversor'
-                on_release: root._inversor.open()
+                #on_release: root._inversor.open()
+                on_release: root.interface.Partida(3)
             #41
             TempBotao:
                 text: 'Resetar'
             #42
             TempBotao:
                 text: 'ATS48 Soft-start'              
+                on_release: root.PartidaPop(1)
             
         BoxLayout:
             orientation: 'horizontal'

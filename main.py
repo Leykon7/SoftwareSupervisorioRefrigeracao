@@ -24,10 +24,13 @@ class Principal(App):
             've.temperatura':710,       #
             've.torque_axial1':1424,
             've.torque_radial1 ':1422
-        }, endValvulas4X ={
+        }, 
+        endValvulas4X ={
             've.xv_scroll.0' :1230,
-            've.xv_hermetico.1' :1230
-        },endPartida4X = {
+            've.xv_hermetico.1' :1230,
+            've.xv5.7':1328
+        },
+        endPartida4X = {
             've.sel_driver' :1324,
             've.indica_driver' :1216,
             've.atv31' :1312,
@@ -272,17 +275,17 @@ class Principal(App):
         """
         
         """
-        Como controlar a veneziana
-        como funcionam os endereços com ponto
-        como funcionam motores
-        que é temperatura do enrolamento
-        como funciona o PID
-        aquecedores ligam ao mesmo tempo
-        velocidade do scroll é para controlar(ve.velocidade_scroll)
+        #Como controlar a veneziana : ve.fv01
+        como funcionam os endereços com ponto??
+        #como funcionam motores : slider vel do inversor, encoder para o mesmo,
+        #que é temperatura do enrolamento : motor
+        #aquecedores ligam ao mesmo tempo ; sim
+        velocidade do scroll é para controlar(ve.velocidade_scroll) ; 
         que é o rendimento do motor
-        Como funciona soft start
-        A frequencia ve.encoder serve para os dois motores
+        #Como funciona soft start : acc e dcc apenas
+        #A frequencia ve.encoder serve para os dois motores : sim
         ver grandezas eletricas
+        xv hermetico e scroll : valvulas 
         """
         return self._widget
 

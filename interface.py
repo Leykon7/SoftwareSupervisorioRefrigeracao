@@ -12,7 +12,7 @@ from datetime import datetime
 import random
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
-from pymodbus.payload import BinaryPayloadBuilder
+#from pymodbus.payload import BinaryPayloadBuilder
 
 
 class Interface(BoxLayout):
@@ -24,6 +24,7 @@ class Interface(BoxLayout):
     _tags = {} #teste
     _tagsValvula4X = {}
     _tagsTelaFP = {}
+    _tagsPartida4X = {}
 
     def __init__(self,**kwargs):
         super().__init__()
@@ -57,6 +58,9 @@ class Interface(BoxLayout):
 
         for key, value in kwargs.get('endValvulas4X').items():
             self._tagsValvula4X[key] = value
+            
+        for key, value in kwargs.get('endPartida4X').items():
+            self._tagsPartida4X[key] = value
 
         #Popups
         self._ModbusPopup = popups.ModbusPopup(self._serverIP,self._port)
@@ -65,7 +69,8 @@ class Interface(BoxLayout):
         self._medidasTelaVent = popups.medidasVent()
         self._medidasTelaComp = popups.medidasComp()
         self._comandoComp = popups.comandoComp()
-        #self._inversor = popups.inversor()
+        self._inversor = popups.inversor()
+        
     _teste = False
     def iniciaColetaDados(self,ip,port):
         """
@@ -120,7 +125,17 @@ class Interface(BoxLayout):
         for key, value in self._tagsValvula4X.items():
             leitura = self._ClienteModbus.read_holding_registers(value,1)[0]
             self._valvulas['Leitura'][key] = leitura
+            
 
+    def Partida(self,tipo):
+        if tipo == 1: #soft
+            self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.sel_driver'],1) 
+        elif tipo == 2: #inversor
+            self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.sel_driver'],2) 
+        elif tipo == 3: #direta
+            self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.sel_driver'],3) 
+        
+        
         #Exemplo de leitura FP
         """
         if tipo == 1:  #Float
@@ -160,6 +175,13 @@ class Interface(BoxLayout):
             self.ids.xv3.source = 'imgs/ValvulaBranca.png'
             self.ids.xv2.source = 'imgs/ValvulaBranca.png'
             self.ids.xv4.source = 'imgs/ValvulaBranca.png'
+            
+        if self._valvulas['Leituras']['ve.xv5.7'] == 1:
+            self.ids.xv5.source = 'imgs/ValvulaAzul.png'
+        else:
+            self.ids.xv5.source = 'imgs/ValvulaBranca.png'
+            
+        
         
         # for key,value in self._tags.items():
         #         self.ids[key].text = str(self.medidas['values'][key])+'ºC'

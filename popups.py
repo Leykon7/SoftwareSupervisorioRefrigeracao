@@ -1,6 +1,7 @@
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.utils import escape_markup
+from interface import InterfaceWidget 
 
 class ModbusPopup(Popup):
     """
@@ -47,7 +48,7 @@ class comandoVent(Popup):
     def __init__(self, **kwargs):
         super().__init__()
         self._inversor = inversor()
-    pass
+    
 
 class comandoComp(Popup):
     """
