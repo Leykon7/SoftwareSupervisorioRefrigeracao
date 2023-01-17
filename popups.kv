@@ -403,6 +403,7 @@
                         id: hermetico
                         color: 98/255, 113/255, 142/255
                         group: 'compressores'
+                        on_active: app.root.sel_Comp(1)
                     Label:
                         text:'Hermético'
                         color: 98/255, 113/255, 142/255
@@ -410,6 +411,7 @@
                         id: scroll
                         color: 98/255, 113/255, 142/255
                         group: 'compressores'
+                        on_active: app.root.sel_Comp(0)
                     Label:
                         text:'Scroll'
                         color: 98/255, 113/255, 142/255
@@ -430,8 +432,10 @@
                     color: 98/255, 113/255, 142/255
                 TempBotao:
                     text:'Ligar'
+                    on_release: app.root.comandoAqueUmi(1,2)
                 TempBotao:
                     text:'Desligar' 
+                    on_release: app.root.comandoAqueUmi(1,3)
             #13
             BoxLayout:
                 orientation:'vertical'
@@ -448,8 +452,10 @@
                     color: 98/255, 113/255, 142/255
                 TempBotao:
                     text:'Ligar'
+                    on_release: app.root.comandoAqueUmi(1,4)
                 TempBotao:
-                    text:'Desligar' 
+                    text:'Desligar'
+                    on_release: app.root.comandoAqueUmi(1,5)
 
             #21
             BoxLayout:
@@ -464,8 +470,10 @@
                         pos: self.x-3,self.y-3
                 TempBotao:
                     text:'Ligar'
+                    on_release:app.root.comandoComp(1)
                 TempBotao:
                     text:'Desligar'
+                    on_release:app.root.comandoComp(0)
 
             #22
             BoxLayout:
@@ -503,12 +511,14 @@
                         size: self.width+3,self.height+3
                         pos: self.x-3,self.y-3
                 Label:
-                    text:'Aquecedor 1'
+                    text:'Aquecedor 2'
                     color: 98/255, 113/255, 142/255
                 TempBotao:
                     text:'Ligar'
+                    on_release: app.root.comandoAqueUmi(1,6)
                 TempBotao:
                     text:'Desligar' 
+                    on_release: app.root.comandoAqueUmi(1,7)
 
 <medidasComp>:
     title: 'Medidas dos Compressores'

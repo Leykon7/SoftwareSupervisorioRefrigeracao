@@ -81,7 +81,6 @@ class Interface(BoxLayout):
         self._medidasTelaComp = popups.medidasComp()
         self._comandoComp = popups.comandoComp()
         self._tempRSTCar = popups.TempRSTCar()
-        #self._inversor = popups.inversor()
                 
     def iniciaColetaDados(self,ip,port):
         """
@@ -99,7 +98,7 @@ class Interface(BoxLayout):
                 self._updateThread = Thread(target=self.atualizador)
                 self._updateThread.start()
                 self.ids.conexao.text = 'CONECTADO'
-                self._ModbusPopup.ids.conBut.text='DESCONECTAR'
+                #self._ModbusPopup.ids.conBut.text='Desconectar'
                 self._ModbusPopup.dismiss()
             else:
                 self._ModbusPopup.porInfo('FALHA NA CONEXÃO!')
@@ -121,6 +120,9 @@ class Interface(BoxLayout):
             self._ClienteModbus.close()
             self.ids.conexao.text = 'ERRO! DESCONECTADO'
             print('Erro', e.args)
+
+    def pararAtualizador(self):
+        self._updateWidgets = False
 
     def lerDados(self):
         """
@@ -152,6 +154,7 @@ class Interface(BoxLayout):
         #Leitura de temperatura dos enrolamentos e carcaça
         self._medidasTempRSTCar['Timestamp'] = datetime.now()
         for key,value in self._tagsTempeRSTCarFP.items():
+            self._conectaCLP.leHRBits(self._ClienteModbus,value['endereco'])
             self._medidasTempRSTCar['Valores'][key] = self._conectaCLP.leFP(self._ClienteModbus,value['endereco'])
         
     def atualizaInterface(self):
@@ -169,7 +172,7 @@ class Interface(BoxLayout):
         self.ids.vel.text =str(self._medidasTela['Valores']['ve.velocidade'])+' m/s'
 
         #Valvulas
-        if self._valvulas['ve.xv_scroll.0'][1] == 0:
+        if self._valvulas['ve.xv_scroll.0'][1] == 1:
             self.ids.xv1.source = 'imgs/ValvulaAzul.png'
             self.ids.xv3.source = 'imgs/ValvulaAzul.png'
         elif self._valvulas['ve.xv_hermetico.1'][1]==1:
@@ -181,7 +184,7 @@ class Interface(BoxLayout):
             self.ids.xv2.source = 'imgs/ValvulaBranca.png'
             self.ids.xv4.source = 'imgs/ValvulaBranca.png'
             
-        if self._valvulas['ve.xv5.7'][7 ]== 1:
+        if self._valvulas['ve.xv5.7'][7]== 1:
             self.ids.xv5.source = 'imgs/ValvulaAzul.png'
         else:
             self.ids.xv5.source = 'imgs/ValvulaBranca.png'
@@ -248,31 +251,35 @@ class Interface(BoxLayout):
             self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.atv31'],comando)
             self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.ats48'],comando)
             self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.ats48'],comando) 
+
+    def comandoAqueUmi(self,comando,maq):
+        lista = self._conectaCLP.leHRBits(self._ClienteModbus, 1329)
+        if comando == 1: #ligar
+            lista[maq] = 1
+            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1329,lista)
+        if comando == 0: #ligar
+            lista[maq] = 0
+            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1329,lista)
+
+    def comandoComp(self, comando):
+        if comando == 0: # desligar
+            lista = self._conectaCLP.leHRBits(self._ClienteModbus, 1329)
+            lista[0] = comando
+            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1329,lista)
+        elif comando == 1: #ligar
+            lista = self._conectaCLP.leHRBits(self._ClienteModbus, 1328)
+            lista[4] = 1
+            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1328,lista)
+# ADICIONAR VELOCIDADE DO SCROLL!
+    def sel_Comp(self, comando):
+        lista = self._conectaCLP.leHRBits(self._ClienteModbus, 1328)
+        if comando == 0: # scroll
+            lista[1] = comando
+            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1328,lista)
+        elif comando == 1: #hermetico
+            lista[1] = 1
+            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1328,lista)
         
-        #Exemplo de leitura FP
-        """
-        if tipo == 1:  #Float
-            leitura = self._cliente.read_holding_registers(addr, 2)
-            decoder = BinaryPayloadDecoder.fromRegisters(leitura, byteorder=Endian.Big, wordorder=Endian.Little)
-            return decoder.decode_32bit_float()
-        """
-        #Exemplo de leitura 4X
-        """"
-        #return self._cliente.read_holding_registers(addr,1)[0]
-
-        """
-
-    def comandoAqueUmidTermo(self):
-        #self._ClienteModbus.write_single_register(self._tagsAqueUmidTermo4X['ve.tesys'],0)
-        pass
-    
-    def comandoComp(self):
-        pass
-        
-         
-        # for key,value in self._tags.items():
-        #         self.ids[key].text = str(self.medidas['values'][key])+'ºC'
-
     def venezianas(self, *args):
         self.ids.veneziana1.angle = args[1]
         self.ids.veneziana2.angle = args[1]
@@ -311,6 +318,12 @@ class conectaCLP(ModbusClient):
 
     def escreve4x(self,cliente,endereco,valor):
         cliente.write_single_register(endereco,valor)
+
+    def escreveHRBits(self,cliente,endereco,valor):
+        valor16bits = int("".join(str(i) for i in valor),2)
+        cliente.write_single_register(endereco,valor16bits)
+        pass
+
 
     def escreveFP(self,cliente,endereco,valor):
         pass

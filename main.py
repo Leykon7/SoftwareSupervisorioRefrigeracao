@@ -217,12 +217,10 @@ class Principal(App):
             've.mv_escreve':1310,
             've.sp_pid':1302,
             've.sp_termo':1338}
-        
         endVeneziana = {
             've.sel_pid' :1332,
             've.mv_escreve':1310
         }
-
         """
         #Como controlar a veneziana : ve.fv01 ---- Qual o endereço?
         como funcionam os endereços com ponto??
@@ -232,6 +230,9 @@ class Principal(App):
         xv hermetico e scroll : valvulas ----- informa automaticamente pra xv1 e xv2?
         """
         return self._widget
+
+    def on_stop(self):
+            self._widget.pararAtualizador()
 
 if __name__ == '__main__':
     Window.size=(1080, 720)

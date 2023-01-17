@@ -24,10 +24,10 @@ class ModbusPopup(Popup):
         self._info.ids.info.add_widget(self._infoLabel)
         self._info.open()
 
-    def conexao(self):
-        if self.ids.conBut.text =='Conectar':
-            pass
-        
+    # def conexao(self):
+    #     if self.ids.conBut.text =='Conectar':
+    #         pass
+
 class info(Popup):
     """
     Popup de informação sobre a conexão
