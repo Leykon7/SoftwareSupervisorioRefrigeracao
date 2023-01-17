@@ -212,6 +212,7 @@
                 spacing:7
                 padding:7
                 CheckBox:
+                    id:axial
                     group: 'ventilador'
                     color: 98/255, 113/255, 142/255
                 Label:
@@ -222,6 +223,7 @@
                 spacing:7
                 padding:7
                 CheckBox:
+                    id:radial
                     group: 'ventilador'
                     color: 98/255, 113/255, 142/255
                 Label:
@@ -295,80 +297,7 @@
                 on_release: root.dismiss()
                 pos_hint:{'center_x':0.5,'center_y':0.5}
         
-<inversor>:
-    title:'Configurações do inversor'
-    size_hint:0.25,0.33
-    BoxLayout:
-        orientation:'vertical'
-        padding:14
-        spacing:7
-        canvas:
-            Color:
-                rgb: 225/255, 228/255, 235/255
-            Rectangle:
-                size: self.size
-                pos: self.pos
-        
-        BoxLayout:
-            orientation:'horizontal'
-            canvas:
-                Color:
-                    rgb:203/255, 208/255, 219/255
-                Rectangle:
-                    size: self.width+3,self.height+3
-                    pos: self.x-3,self.y-3
-            GridLayout:
-                rows:3
-                cols:2
-                padding:7
-                spacing:7
-                #11
-                Label:
-                    text:'ACC'
-                    color: 98/255, 113/255, 142/255
-                #12
-                TextInput:
-                    id:acc
-                    halign:'center'
-                    valigh:'middle'
-                #21
-                Label:
-                    text:'DCC'
-                    color: 98/255, 113/255, 142/255
-                #22
-                TextInput:
-                    id:dcc
-                    halign:'center'
-                    valigh:'middle'
-                #21
-                Label:
-                    text:'Velocidade'
-                    color: 98/255, 113/255, 142/255
-                #22
-                TextInput:
-                    id:velocidade
-                    halign:'center'
-                    valigh:'middle'
-            Slider:
-                size_hint_x:0.5
-                min: 0
-                max: 100
-                step: 1
-                orientation: 'vertical'
-        BoxLayout:
-            orientation:'vertical'
-            padding:14
-            size_hint:0.5,0.5
-            pos_hint:{'center_x':0.5}
-            canvas:
-                Color:
-                    rgb:203/255, 208/255, 219/255
-                Rectangle:
-                    size: self.width+3,self.height+3
-                    pos: self.x-3,self.y-3
-            TempBotao:
-                text:'Fechar'
-                on_release: root.dismiss()        
+      
 
 <medidasVent>:
     title: 'Medidas dos ventiladores'
@@ -647,6 +576,75 @@
                 pos_hint: {'center_x': 0.5, 'center_y':0.5}
                 on_release: root.dismiss()
 
+<TempRSTCar>:
+    title: 'Temperaturas'
+    size_hint:0.5,0.33
+    BoxLayout:
+        orientation:'vertical'
+        padding:14
+        spacing: 14
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        GridLayout:
+            rows:4
+            cols:2
+            spacing:7
+            padding:7
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            #11
+            Label:
+                text: 'Temperatura no enrolamento R:'
+                font_size: 21
+                color: 98/255, 113/255, 142/255
+            #12
+            Label:
+                id:temp_r
+                text: '-.-'
+                font_size: 21
+                color: 98/255, 113/255, 142/255
+            #21
+            Label:
+                text: 'Temperatura no enrolamento S:'
+                font_size: 21
+                color: 98/255, 113/255, 142/255
+            #22
+            Label:
+                id:temp_s
+                text: '-.-'
+                font_size: 21
+                color: 98/255, 113/255, 142/255
+            #31
+            Label:
+                text: 'Temperatura no enrolamento T:'
+                font_size: 21
+                color: 98/255, 113/255, 142/255
+            #32
+            Label:
+                id:temp_t
+                text: '-.-'
+                font_size: 21
+                color: 98/255, 113/255, 142/255
+            #41
+            Label:
+                text: 'Temperatura da Carcaça:'
+                font_size: 21
+                color: 98/255, 113/255, 142/255
+            #42
+            Label:
+                id:carcaca
+                text: '-.-'
+                font_size: 21
+                color: 98/255, 113/255, 142/255
+                halign:'right'
 
 <TempBotao@Button>:
     background_normal: ''

@@ -10,7 +10,7 @@
             Rectangle:
                 size: self.size
         Image:
-            source: 'imgs/BackgroundV1.png'
+            source: 'imgs/Background.png'
 
         #Configurações
         BoxLayout:
@@ -214,6 +214,13 @@
 
         #Sensores
         Label:
+            color: 98/255, 113/255, 142/255
+            text: 'SENSORES'
+            size_hint: 0.065, 0.04
+            pos_hint: {'x':0.545, 'y':0.865}
+            font_size: 21
+            bold: True
+        Label:
             id: pit1
             color: 98/255, 113/255, 142/255
             text: '-.-'
@@ -273,7 +280,7 @@
             text: '-.-'
             size_hint: 0.065, 0.04
             #pos: 830,660
-            pos_hint: {'x':0.55, 'y':0.76}
+            pos_hint: {'x':0.55, 'y':0.81}
             font_size: 21
 
         Label:
@@ -282,7 +289,7 @@
             text: '-.-'
             size_hint: 0.065, 0.04
             #pos: 830,690
-            pos_hint: {'x':0.55, 'y':0.79}
+            pos_hint: {'x':0.55, 'y':0.77}
             font_size: 21
         Label:
             id: freq_motor
@@ -422,3 +429,4 @@
                     pos: self.x-7,self.y-7
             TempBotao: 
                 text:'Temperatura'
+                on_release: root._tempRSTCar.open()

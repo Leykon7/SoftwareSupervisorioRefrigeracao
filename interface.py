@@ -24,8 +24,10 @@ class Interface(BoxLayout):
     _tags = {} #teste
     _tagsValvula4X = {}
     _tagsTelaFP = {}
+    _tagsTempeRSTCarFP = {}
     _tagsPartida4X = {}
     _tagsMotor4X = {}
+    _tagsAqueUmidTermo4X={}
 
     def __init__(self,**kwargs):
         super().__init__()
@@ -43,6 +45,9 @@ class Interface(BoxLayout):
         self._medidasTela['Valores']={}
         self._valvulas = {}
         self._valvulas['Leitura']={}
+        self._medidasTempRSTCar = {}
+        self._medidasTempRSTCar['Timestamp']=None
+        self._medidasTempRSTCar['Valores']={}
 
         ##Dá cor e salva no dict _tags
         """ cor_plot =(random.random(),random.random(),random.random(),1)
@@ -50,6 +55,10 @@ class Interface(BoxLayout):
         for key, value in kwargs.get('endTelaFP').items():
             cor_plot=(random.random(),random.random(),random.random(),1)
             self._tagsTelaFP[key] = {'endereco': value, 'color': cor_plot}
+        
+        for key, value in kwargs.get('endTempFP').items():
+            cor_plot=(random.random(),random.random(),random.random(),1)
+            self. _tagsTempeRSTCarFP[key] = {'endereco': value, 'color': cor_plot}
 
         for key, value in kwargs.get('endValvulas4X').items():
             self._tagsValvula4X[key] = value
@@ -60,6 +69,9 @@ class Interface(BoxLayout):
         for key, value in kwargs.get('endMotor4X').items():
             self._tagsMotor4X[key] = value
 
+        for key, value in kwargs.get('endAqueUmidTerm4X').items():
+            self._tagsAqueUmidTermo4X[key] = value
+
         #Popups
         self._ModbusPopup = popups.ModbusPopup(self._serverIP,self._port)
         self._ScanPopup = popups.ScanPopup(self._scan_time)
@@ -67,6 +79,7 @@ class Interface(BoxLayout):
         self._medidasTelaVent = popups.medidasVent()
         self._medidasTelaComp = popups.medidasComp()
         self._comandoComp = popups.comandoComp()
+        self._tempRSTCar = popups.TempRSTCar()
         #self._inversor = popups.inversor()
                 
     _teste = False
@@ -123,52 +136,13 @@ class Interface(BoxLayout):
         for key, value in self._tagsValvula4X.items():
             leitura = self._ClienteModbus.read_holding_registers(value,1)[0]
             self._valvulas['Leitura'][key] = leitura
-            
-    def Partida(self,tipo):
-        if tipo == 1: #soft
-            self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.sel_driver'],1) 
-        elif tipo == 2: #inversor
-            self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.sel_driver'],2)
-        elif tipo == 3: #direta
-            self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.sel_driver'],3) 
 
-    def comandoMotor(self,comando):
-        if comando ==0: #desligar
-            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],0) 
-            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],0) 
-            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],0) 
-
-        elif comando == 1: #ligar
-            if self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],0) and self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],0) and self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],0):
-                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],0) 
-                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],0) 
-                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],0) 
-
-            if self._ClienteModbus.read_holding_registers(self._tagsPartida4X['ve.indica_driver'],1)[0] == 1:
-                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],1)
-            elif self._ClienteModbus.read_holding_registers(self._tagsPartida4X['ve.indica_driver'],1)[0] == 2:
-                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],1) 
-            elif self._ClienteModbus.read_holding_registers(self._tagsPartida4X['ve.indica_driver'],1)[0] == 3:
-                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],1) 
-        
-        elif comando == 2: #resetar
-            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],2) 
-            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],2) 
-            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],2)    
-        
-        #Exemplo de leitura FP
-        """
-        if tipo == 1:  #Float
-            leitura = self._cliente.read_holding_registers(addr, 2)
+        self._medidasTela['Timestamp'] = datetime.now()
+        for key,value in self._tagsTempeRSTCarFP.items():
+            leitura = self._ClienteModbus.read_holding_registers(value['endereco'],2)
             decoder = BinaryPayloadDecoder.fromRegisters(leitura, byteorder=Endian.Big, wordorder=Endian.Little)
-            return decoder.decode_32bit_float()
-        """
-        #Exemplo de leitura 4X
-        """"
-        #return self._cliente.read_holding_registers(addr,1)[0]
-
-        """
-
+            self._medidasTempRSTCar['Valores'][key] = decoder.decode_32bit_float()
+        
     def atualizaInterface(self):
         """
         Método que atualiza a interface gráfica a partir dos dados lidos
@@ -200,6 +174,86 @@ class Interface(BoxLayout):
             self.ids.xv5.source = 'imgs/ValvulaAzul.png'
         else:
             self.ids.xv5.source = 'imgs/ValvulaBranca.png'
+
+        #Temperaturas R, S, T e Carcaça
+        self.ids.temp_r.text =str((self._medidasTela['Valores']['ve.temp_r'])/10)+' ºC'
+        self.ids.temp_s.text =str((self._medidasTela['Valores']['ve.temp_s'])/10)+' ºC'
+        self.ids.temp_t.text =str((self._medidasTela['Valores']['ve.temp_t'])/10)+' ºC'
+        self.ids.carcaca.text =str((self._medidasTela['Valores']['ve.temp_carc'])/10)+' ºC'
+
+    def Partida(self,tipo):
+        if tipo == 1: #soft
+            self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.sel_driver'],1) 
+        elif tipo == 2: #inversor
+            self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.sel_driver'],2)
+        elif tipo == 3: #direta
+            self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.sel_driver'],3) 
+
+    def comandoMotor(self,comando):
+        if comando ==0: #desligar
+            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],0) 
+            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],0) 
+            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],0) 
+
+        elif comando == 1: #ligar
+            ### botar rendimento do motor
+
+            if self._comandoVent.ids.axial.active:
+                self.ids.helice0.source ='imgs/helicebaixadaAzul.png'
+                self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
+                self.ids.hel0.start()
+                self.ids.hel1.stop()
+                
+            elif self._comandoVent.ids.radial.active:
+                self.ids.helice1.source ='imgs/helicebaixadaAzul.png'
+                self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
+                self.ids.hel1.start()
+                self.ids.hel0.stop()
+
+            if self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],0) or self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],0) or self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],0):
+                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],0) 
+                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],0) 
+                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],0) 
+
+            if self._ClienteModbus.read_holding_registers(self._tagsPartida4X['ve.indica_driver'],1)[0] == 1:
+                self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.ats48_acc'],self._comandoVent.ids.acc.text)
+                self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.ats48_dcc'],self._comandoVent.ids.dcc.text)
+                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],1)
+
+            elif self._ClienteModbus.read_holding_registers(self._tagsPartida4X['ve.indica_driver'],1)[0] == 2:
+                self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.atv31_acc'],self._comandoVent.ids.acc.text)
+                self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.atv31_dcc'],self._comandoVent.ids.dcc.text)
+                self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.atv31_velocidade'],self._comandoVent.ids.dcc.text)
+                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],1) 
+
+            elif self._ClienteModbus.read_holding_registers(self._tagsPartida4X['ve.indica_driver'],1)[0] == 3:
+                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],1) 
+        
+        elif comando == 2: #resetar
+            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.atv31'],2) 
+            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],2) 
+            self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.tesys'],2)    
+        
+        #Exemplo de leitura FP
+        """
+        if tipo == 1:  #Float
+            leitura = self._cliente.read_holding_registers(addr, 2)
+            decoder = BinaryPayloadDecoder.fromRegisters(leitura, byteorder=Endian.Big, wordorder=Endian.Little)
+            return decoder.decode_32bit_float()
+        """
+        #Exemplo de leitura 4X
+        """"
+        #return self._cliente.read_holding_registers(addr,1)[0]
+
+        """
+
+    def comandoAqueUmidTermo(self):
+        #self._ClienteModbus.write_single_register(self._tagsAqueUmidTermo4X['ve.tesys'],0)
+        pass
+    
+    def comandoComp(self):
+        pass
+        
             
         # for key,value in self._tags.items():
         #         self.ids[key].text = str(self.medidas['values'][key])+'ºC'

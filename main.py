@@ -45,6 +45,27 @@ class Principal(App):
             've.atv31' :1312,
             've.ats48' :1316,
             've.tesys' :1319,
+        },
+        endAqueUmidTerm4X={
+            've.liga_umi.2':1329, 
+            've.desliga_umi.3':1329,
+            've.liga_aq1.4':1329,
+            've.desliga_aq1.5':1329,
+            've.liga_aq2.6':1329,
+            've.desliga_aq2.7':1329,
+            've.sp_termo':1338
+        },
+        endComp4X = {
+            've.sel_tipo_compressor.1':1328,
+            've.liga_compressor.4':1328,
+            've.desliga_compressor.0' :1329,
+            've.velocidade_scroll':1236
+        },
+        endTempFP ={
+            've.temp_r':700,
+            've.temp_s':702,
+            've.temp_t':704,
+            've.temp_carc':706
         })
         modbus_enderecos4X={
             've.frequencia' :630,
@@ -196,105 +217,19 @@ class Principal(App):
             've.mv_escreve':1310,
             've.sp_pid':1302,
             've.sp_termo':1338}
-        endTempFP ={
-            've.temp_r':700,
-            've.temp_s':702,
-            've.temp_t':704,
-            've.temp_carc':706
-        }
-        """
-        ve.temp_r	    ##Temperatura Enrolamento r			
-        ve.temp_s	    ##Temperatura Enrolamento s			
-        ve.temp_t   	##Temperatura Enrolamento t			
-        ve.temp_carc	##Temperatura Carcaça			
-        """
-        endAqueUmidTerm4X={
-            've.liga_umi.2':1329, 
-            've.desliga_umi.3':1329,
-            've.liga_aq1.4':1329,
-            've.desliga_aq1.5':1329,
-            've.liga_aq2.6':1329,
-            've.desliga_aq2.7':1329,
-            've.sp_termo':1338
-        }
-        """
-        ve.liga_umi         0   ##Umidificador
-        ve.desliga_umi      1
-        ve.liga_aq1	        0   ##Aquecedor 1
-        ve.desliga_aq1	    0   
-        ve.liga_aq2	        0   ##Aquecedor 2
-        ve.desliga_aq2	    0
-        ve.sp_termo             ##Termostato
-        """
-        endComp4X = {
-            've.sel_tipo_compressor.1':1328,
-            've.liga_compressor.4':1328,
-            've.desliga_compressor.0' :1329,
-            've.velocidade_scroll':1236
-        }
-        """
-        	                            Scroll	Hermético		
-            ve.sel_tipo_compressor  #	  0	        1		
-            ve.desliga_compressor	#     0			
-            ve.liga_compressor	    #     1			
-            ve.velocidade_scroll	#Velocidade do compressor Scroll
-        """
-        endMotor4X = {
-            've.atv31' :1312,
-            've.ats48' :1316,
-            've.tesys' :1319,
-            've.atv31_velocidade' :1313,
-            've.atv31_acc' :1314,
-            've.atv31_dcc' :1315,
-            've.ats48_acc' :1317,
-            've.ats48_dcc' :1318,
-            've.sel_tipo_ventilador.2':1328,
-            've.sel_rendimento.5':1328
-        }
-        """
-        ve.acc	                  ##Tempo de aceleração inversor			
-        ve.dcc	                  ##Tempo de desaceleração inversor			
-        ve.atv31_velocidade	      ## 0 a 60			
-                                    Axial	Radial		
-        ve.sel_tipo_ventilador	  ##  1     	0		
-                                    Alto	Convencional		
-        ve.sel_rendimento	      ##  0            1		
-        """
         
-        """
-        ve.sel_driver	##Soft	        1		
-                          Inversor	    2		
-                          Direta	    3		
-                                        Liga    Desliga	Reset
-        ve.ats48	  ##Liga Soft	     1	       0	 2
-        ve.atv31	  ##Liga Inversor	 1	       0	 2
-        ve.tesys	  ##Liga Direta	     1	       0	 2
-
-        ve.indica_driver ##Indica driver selecionado?
-        """
         endVeneziana = {
             've.sel_pid' :1332,
             've.mv_escreve':1310
         }
+
         """
-        	                Automático	Manual
-            ve.sel_pid	        0	      1
-            ve.fv01	        MV
-            ve.mv_escreve  escrever no MV?
-        """
-        
-        """
-        #Como controlar a veneziana : ve.fv01
+        #Como controlar a veneziana : ve.fv01 ---- Qual o endereço?
         como funcionam os endereços com ponto??
-        #como funcionam motores : slider vel do inversor, encoder para o mesmo,
-        #que é temperatura do enrolamento : motor
-        #aquecedores ligam ao mesmo tempo ; sim
-        velocidade do scroll é para controlar(ve.velocidade_scroll) ; 
-        que é o rendimento do motor
-        #Como funciona soft start : acc e dcc apenas
-        #A frequencia ve.encoder serve para os dois motores : sim
-        ver grandezas eletricas
-        xv hermetico e scroll : valvulas 
+        velocidade do scroll é para controlar(ve.velocidade_scroll) ou só leitura? 
+        que é o rendimento do motor 
+        ver grandezas eletricas --- quais utilizar
+        xv hermetico e scroll : valvulas ----- informa automaticamente pra xv1 e xv2?
         """
         return self._widget
 
