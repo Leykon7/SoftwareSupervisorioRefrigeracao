@@ -24,6 +24,10 @@ class ModbusPopup(Popup):
         self._info.ids.info.add_widget(self._infoLabel)
         self._info.open()
 
+    def conexao(self):
+        if self.ids.conBut.text =='Conectar':
+            pass
+        
 class info(Popup):
     """
     Popup de informação sobre a conexão
@@ -60,7 +64,7 @@ class comandoVent(Popup):
 
         self._opcBox = BoxLayout(size_hint_y=0.5, center_x=0.1,center_y=0.5, spacing=7)
         self._opcBox.add_widget(Label(text='[color=62718e]Velocidade[/color]', markup=True))
-        self._opcBox.add_widget(TextInput(halign='center',valign = 'middle', size_hint_y=0.75,size_hint_x=0.3, right=0.5))
+        self._opcBox.add_widget(TextInput(id='vel',halign='center',valign = 'middle', size_hint_y=0.75,size_hint_x=0.3, right=0.5))
 
         self._opcMainBox = BoxLayout(orientation='vertical',spacing=7)
         self._opcMainBox.add_widget(self._opcGrid)
