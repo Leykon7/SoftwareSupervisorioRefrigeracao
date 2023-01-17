@@ -33,6 +33,15 @@ class Principal(App):
         endPartida4X = {
             've.sel_driver' :1324,
             've.indica_driver' :1216,
+            've.atv31_velocidade' :1313,
+            've.atv31_acc' :1314,
+            've.atv31_dcc' :1315,
+            've.ats48_acc' :1317,
+            've.ats48_dcc' :1318,
+            've.sel_tipo_ventilador.2':1328,
+            've.sel_rendimento.5':1328
+        },
+        endMotor4X = {
             've.atv31' :1312,
             've.ats48' :1316,
             've.tesys' :1319,
@@ -290,9 +299,9 @@ class Principal(App):
         return self._widget
 
 if __name__ == '__main__':
-    Window.size=(1080, 720)
+    #Window.size=(1080, 720)
     #Window.resizable=False
-    #Window.fullscreen = 'auto'
+    Window.fullscreen = 'auto'
     Builder.load_string(open("interface.kv",encoding="utf-8").read(),rulesonly=True)
     Builder.load_string(open("popups.kv",encoding="utf-8").read(),rulesonly=True)
     Principal().run()

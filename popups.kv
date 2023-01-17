@@ -144,7 +144,7 @@
 
 <comandoVent>:
     title: 'Comandos dos ventiladores'
-    size_hint: 0.5, 0.5
+    size_hint: 0.42, 0.90
     spacing: 49
     BoxLayout:
         orientation:'vertical'
@@ -156,82 +156,12 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        GridLayout:
-            cols:2
-            rows:4
-            spacing:7
-            padding:7
-            canvas:
-                Color:
-                    rgb:203/255, 208/255, 219/255
-                Rectangle:
-                    size: self.width+3,self.height+3
-                    pos: self.x-3,self.y-3
-            #11
-            Label:
-                text: 'Comando do Ventilador'
-                color: 98/255, 113/255, 142/255
-            #12
-            Label:
-                text: 'Selecionar Tipo de partida'
-                color: 98/255, 113/255, 142/255
-            #21
-            TempBotao:
-                text:'Ligar'
-            #22
-            TempBotao:
-                text: 'Tesys Direta'
-                on_release: root.self.interface.Partida(3)
-            #31 
-            TempBotao:
-                text:'Desligar'
-            #32
-            TempBotao:
-                text: 'ATV31 Inversor'
-                #on_release: root._inversor.open()
-                on_release: root.interface.Partida(3)
-            #41
-            TempBotao:
-                text: 'Resetar'
-            #42
-            TempBotao:
-                text: 'ATS48 Soft-start'              
-                on_release: root.PartidaPop(1)
-            
-        BoxLayout:
-            orientation: 'horizontal'
-            padding:7
-            size_hint:0.5,0.2
-            pos_hint:{'center_x':0.5}
-            canvas:
-                Color:
-                    rgb:203/255, 208/255, 219/255
-                Rectangle:
-                    size: self.width+3,self.height+3
-                    pos: self.x-3,self.y-3
-            CheckBox:
-                id: axial
-                group: 'ventilador'
-                color: 98/255, 113/255, 142/255
-            Label:
-                text:'Axial'
-                color: 98/255, 113/255, 142/255
-                halign:'left'
-            CheckBox:
-                id: radial
-                group: 'ventilador'
-                color: 98/255, 113/255, 142/255
-            Label:
-                text:'Radial'
-                color: 98/255, 113/255, 142/255
-                halign:'left'
-
         BoxLayout:
             orientation:'horizontal'
+            spacing:7
             padding:7
-            size_hint:0.5,0.25
+            size_hint:0.75,0.35
             pos_hint:{'center_x':0.5}
-
             canvas:
                 Color:
                     rgb:203/255, 208/255, 219/255
@@ -239,9 +169,132 @@
                     size: self.width+3,self.height+3
                     pos: self.x-3,self.y-3
             TempBotao:
-                text:'Fechar'
+                text:'desligar'
+            TempBotao:
+                text:'resetar'
+        BoxLayout:
+            orientation:'vertical'
+            spacing:7
+            padding:7
+            size_hint:0.5,3*0.35
+            pos_hint:{'center_x':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text:'Direto'
+                on_release: root.limparOpc()
+            TempBotao:
+                text:'inversor'
+                on_release: root.porOpcoes(True)
+            TempBotao:
+                text:'soft'
+                on_release: root.porOpcoes(False)
+        GridLayout:
+            rows:2
+            cols:3
+            padding:7
+            size_hint_y: 0.4
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            Label:
+                text:'Seleção do ventilador'
+                color: 98/255, 113/255, 142/255
+            BoxLayout:
+                orientation:'horizontal'
+                spacing:7
+                padding:7
+                CheckBox:
+                    group: 'ventilador'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Axial'
+                    color: 98/255, 113/255, 142/255
+            BoxLayout:
+                orientation:'horizontal'
+                spacing:7
+                padding:7
+                CheckBox:
+                    group: 'ventilador'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Radial'
+                    color: 98/255, 113/255, 142/255
+            Label:
+                text:'Seleção do motor'
+                color: 98/255, 113/255, 142/255
+            BoxLayout:
+                orientation:'horizontal'
+                spacing:7
+                padding:7
+                CheckBox:
+                    group: 'motor'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Alto'
+                    color: 98/255, 113/255, 142/255
+            BoxLayout:
+                orientation:'horizontal'
+                spacing:7
+                padding:7
+                CheckBox:
+                    group: 'motor'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'convencional'
+                    color: 98/255, 113/255, 142/255
+        BoxLayout:
+            id:opcoes
+            orientation:'vertical'
+            spacing:7
+            padding:7
+            size_hint_x:0.5
+            pos_hint: {'center_x':0.5,'center_y':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+        
+        BoxLayout:
+            orientation:'horizontal'
+            spacing:7
+            padding:7
+            size_hint:0.5,0.35
+            pos_hint:{'center_x':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text:'ligar'
+        BoxLayout:
+            orientation:'horizontal'
+            spacing:7
+            padding:7
+            size_hint:0.5,0.35
+            pos_hint:{'center_x':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text:'fechar'
                 on_release: root.dismiss()
                 pos_hint:{'center_x':0.5,'center_y':0.5}
+        
 <inversor>:
     title:'Configurações do inversor'
     size_hint:0.25,0.33

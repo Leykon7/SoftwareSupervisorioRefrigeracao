@@ -3,6 +3,7 @@
 <Interface>:
     orientation: 'vertical'
     FloatLayout:
+        id:gui
         canvas:
             Color:
                 rgb: 225/255, 228/255, 235/255
@@ -12,12 +13,6 @@
             source: 'imgs/BackgroundV1.png'
 
         #Configurações
-        BoxLayout:
-            orientation:'vertical'
-            pos_hint: {'x':0.8, 'y':0.79}
-            size_hint: 2*0.065, 3*0.04
-            TempBotao: 
-                text:'Temperatura'
         BoxLayout:
             orientation:'vertical'
             pos_hint: {'x':0.68, 'y':0.79}
@@ -289,6 +284,22 @@
             #pos: 830,690
             pos_hint: {'x':0.55, 'y':0.79}
             font_size: 21
+        Label:
+            id: freq_motor
+            color: 98/255, 113/255, 142/255
+            text: '0.0 RPM'
+            size_hint: 0.06, 0.02
+            #pos: 375,630
+            pos_hint: {'right':0.220, 'y':0.75}
+            font_size: 16
+        Label:
+            id: torque_motor
+            color: 98/255, 113/255, 142/255
+            text: '0.0 N.m'
+            size_hint: 0.06, 0.02
+            #pos: 375,630
+            pos_hint: {'right':0.220, 'y':0.78}
+            font_size: 16
 
         #Hélices
         Helices:
@@ -393,13 +404,21 @@
             canvas.after:
                 PopMatrix
 
-        Button:
+        TempBotao:
             text: 'Medidas'
             size_hint: 0.065, 0.04
             #pos: 525, 525
             pos_hint: {'x':0.345, 'y':0.62}
-            background_normal: ''
-            background_color: 133/255, 146/255, 171/255
-            background_down: ''
-            on_press: self.background_color= (85/255, 101/255, 133/255)
-            on_release: self.background_color= (133/255, 146/255, 171/255)
+        #TemperaturaRST
+        BoxLayout:
+            orientation:'vertical'
+            pos_hint: {'x':0.265, 'y':0.5}
+            size_hint: 0.065, 0.04
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+14,self.height+14
+                    pos: self.x-7,self.y-7
+            TempBotao: 
+                text:'Temperatura'
