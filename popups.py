@@ -57,7 +57,7 @@ class comandoVent(Popup):
     def porOpcoes(self, tipo):
         self.limparOpc()
         self._opcGrid = GridLayout(rows=2,cols=2,padding=7,spacing=7)
-        self._opcGrid.add_widget(Label(id='acc', text='[color=62718e]ACC (mín. 10s e máx. 60s)[/color]', markup=True))
+        self._opcGrid.add_widget(Label(id=acc, text='[color=62718e]ACC (mín. 10s e máx. 60s)[/color]', markup=True))
         self._opcGrid.add_widget(TextInput(halign='center',valign = 'middle',size_hint_x=0.4, center_x=0.5, center_y=0.5))
         self._opcGrid.add_widget(Label(id='dcc', text='[color=62718e]DCC (mín. 10s e máx. 60s)[/color]', markup=True))
         self._opcGrid.add_widget(TextInput(halign='center',valign = 'middle',size_hint_x=0.4, center_x=0.5, center_y=0.5))

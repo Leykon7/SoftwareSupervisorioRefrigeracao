@@ -83,7 +83,9 @@
             size_hint: 0.05,0.05
             pos_hint: {'x':0.137, 'y':0.485}
             group: 'ventiladoran'
-            on_active: root.checkboxes(1)
+            on_active: 
+                root.checkboxes(1)
+                root.testeMoverVenezianas()
         Label:
             text: 'Radial'
             pos_hint: {'x':0.152, 'y':0.487}
@@ -350,6 +352,7 @@
 
         #Venezianas
         Slider:
+            id:slider
             min: -90
             max: 0
             step: 1
@@ -358,7 +361,9 @@
             size_hint: 0.1,0.1
             #pos: 500, 550
             pos_hint: {'center_x':0.375,'center_y':0.69}
-            on_value: root.venezianas(*args)
+            on_value: 
+                root.venezianas(*args)
+            on_touch_up:root.testeMoverVenezianas()
 
         Image:
             id: veneziana1

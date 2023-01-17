@@ -66,7 +66,12 @@ class Principal(App):
             've.temp_s':702,
             've.temp_t':704,
             've.temp_carc':706
-        })
+        },
+        endVeneziana = {
+            've.sel_pid' :1332,
+            've.mv_escreve':1310
+        }
+        )
         modbus_enderecos4X={
             've.frequencia' :630,
             've.tipo_motor' :78,

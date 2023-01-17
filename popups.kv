@@ -171,6 +171,7 @@
                     pos: self.x-3,self.y-3
             TempBotao:
                 text:'desligar'
+                on_release: app.root.comandoMotor(0)
             TempBotao:
                 text:'resetar'
         BoxLayout:
@@ -280,7 +281,8 @@
                     size: self.width+3,self.height+3
                     pos: self.x-3,self.y-3
             TempBotao:
-                text:'ligar'
+                text:'Ligar'
+                on_release: app.root.comandoMotor(1)
         BoxLayout:
             orientation:'horizontal'
             spacing:7

@@ -29,6 +29,7 @@ class Interface(BoxLayout):
     _tagsPartida4X = {}
     _tagsMotor4X = {}
     _tagsAqueUmidTermo4X={}
+    _tagsVeneziana4X = {}
 
     def __init__(self,**kwargs):
         super().__init__()
@@ -72,6 +73,9 @@ class Interface(BoxLayout):
         for key, value in kwargs.get('endAqueUmidTerm4X').items():
             self._tagsAqueUmidTermo4X[key] = value
 
+        for key, value in kwargs.get('endVeneziana').items():
+            self._tagsVeneziana4X[key] = value
+            
         self._conectaCLP = conectaCLP()
         #Popups
         self._ModbusPopup = popups.ModbusPopup(self._serverIP,self._port)
@@ -114,6 +118,7 @@ class Interface(BoxLayout):
             while self._updateWidgets:
                 self.lerDados()
                 self.atualizaInterface()
+                #guardar todas escritas num dict por meio de um método
                 #Inserir no banco de dados
                 sleep(self._scan_time/1000)
         except Exception as e:
@@ -138,10 +143,8 @@ class Interface(BoxLayout):
         _tagsValvulas4X = {'ve.pit':502,'ve.tit':504, ....}
 
         _valvulas = {'ve.xv':[0,0,1,0...], 've.xv':[0,0,1,0...], ...}
-
-        
+    
         """
-
         #Dados da tela
         self._medidasTela['Timestamp'] = datetime.now()
         for key,value in self._tagsTelaFP.items():
@@ -205,14 +208,12 @@ class Interface(BoxLayout):
 
     def comandoMotor(self,comando):
         if comando ==0: #desligar
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.atv31'],comando)
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.ats48'],comando)
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.ats48'],comando)
+            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsMotor4X['ve.atv31'],comando)
+            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsMotor4X['ve.ats48'],comando)
+            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsMotor4X['ve.ats48'],comando)
 
         elif comando == 1: #ligar
-
             ### botar rendimento do motor
-
             #Trocar animação das helices
             if self._comandoVent.ids.axial.active:
                 self.ids.helice0.source ='imgs/helicebaixadaAzul.png'
@@ -279,6 +280,23 @@ class Interface(BoxLayout):
         elif comando == 1: #hermetico
             lista[1] = 1
             self._conectaCLP.escreveHRBits(self._ClienteModbus, 1328,lista)
+            
+    def testeMoverVenezianas(self,*args):
+        self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsVeneziana4X['ve.sel_pid'],1)
+        ### FAZER DICT QUE ARMAZENA LEITURAS
+        self._conectaCLP.escreve4x(self._ClienteModbus, self._tagsVeneziana4X['ve.mv_escreve'],self.ids.slider.value)
+        #ERRO : 
+        """
+        File "<string>", line 366, in <module>
+   File "c:\Users\Esteira\Downloads\SoftwareSupervisorioRefrigeracao-master\interface.py", line 287, in testeMoverVenezianas    
+     self._conectaCLP.escreve4x(self._ClienteModbus, self._tagsVeneziana4X['ve.mv_escreve'],self.ids.slider.value)
+   File "c:\Users\Esteira\Downloads\SoftwareSupervisorioRefrigeracao-master\interface.py", line 327, in escreve4x
+     cliente.write_single_register(endereco,valor)
+   File "C:\Users\Esteira\AppData\Local\Programs\Python\Python310\lib\site-packages\pyModbusTCP\client.py", line 506, in write_single_register
+     raise ValueError('reg_value out of range (valid from 0 to 65535)')
+ ValueError: reg_value out of range (valid from 0 to 65535)
+        """
+        pass
         
     def venezianas(self, *args):
         self.ids.veneziana1.angle = args[1]
@@ -323,7 +341,6 @@ class conectaCLP(ModbusClient):
         valor16bits = int("".join(str(i) for i in valor),2)
         cliente.write_single_register(endereco,valor16bits)
         pass
-
 
     def escreveFP(self,cliente,endereco,valor):
         pass
