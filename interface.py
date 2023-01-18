@@ -163,7 +163,7 @@ class Interface(BoxLayout):
         Metodo de leitura de dados pelo protocolo modbus
         Atualiza o atributo medidas
         """
-        #Dados da tela
+        # Dados da tela
         # self._medidasTela['Timestamp'] = datetime.now()
         # for key,value in self._tagsTelaFP.items():
         #     self._medidasTela['Valores'][key] = self._conectaCLP.leFP(self._ClienteModbus,value['endereco'])
@@ -188,20 +188,20 @@ class Interface(BoxLayout):
         elif self._comandoComp.ids.scroll.active:
             self._dadosUteis['4X']['tipo_motor']= 2
         self._dadosUteis['FP']['temperatura_tit1']=	self._conectaCLP.leFP(self._ClienteModbus,	1220)/10
-        self._dadosUteis['FP']['temperatura_tit2']=	self._conectaCLP.leFP(self._ClienteModbus,	1224)/10
-        self._dadosUteis['FP']['pressao_pit1']=	self._conectaCLP.leFP(self._ClienteModbus,	1218)/10
+        self._dadosUteis['FP']['temperatura_tit2']=	self._conectaCLP.leFP(self._ClienteModbus,	1218)/10
+        self._dadosUteis['FP']['pressao_pit1']=	self._conectaCLP.leFP(self._ClienteModbus,	1224)/10
         self._dadosUteis['FP']['pressao_pit2']=	self._conectaCLP.leFP(self._ClienteModbus,	1222)/10
         self._dadosUteis['FP']['pressao_pit3']=	self._conectaCLP.leFP(self._ClienteModbus,	1226)/10
         self._dadosUteis['FP']['vazao_saida']=	self._conectaCLP.leFP(self._ClienteModbus,	714)
-        self._dadosUteis['FP']['velocidade_saida']=	self._conectaCLP.leFP(self._ClienteModbus,	710)
-        self._dadosUteis['FP']['temp_ar_saida']=	self._conectaCLP.leFP(self._ClienteModbus,	712)
+        self._dadosUteis['FP']['velocidade_saida']=	self._conectaCLP.leFP(self._ClienteModbus,	712)
+        self._dadosUteis['FP']['temp_ar_saida']=	self._conectaCLP.leFP(self._ClienteModbus,	710)
         self._dadosUteis['FP']['freq_motor']=	self._conectaCLP.leFP(self._ClienteModbus,	884)
         self._dadosUteis['FP']['torque_motor_axial']=	self._conectaCLP.leFP(self._ClienteModbus,	1424)
         self._dadosUteis['FP']['torque_motor_radial']=	self._conectaCLP.leFP(self._ClienteModbus,	1422)
-        self._dadosUteis['FP']['temperatura_R']=	self._conectaCLP.leFP(self._ClienteModbus,	700)
-        self._dadosUteis['FP']['temperatura_S']=	self._conectaCLP.leFP(self._ClienteModbus,	702)
-        self._dadosUteis['FP']['temperatura_T']=	self._conectaCLP.leFP(self._ClienteModbus,	704)
-        self._dadosUteis['FP']['temperatura_Carc']=	self._conectaCLP.leFP(self._ClienteModbus,	70)
+        self._dadosUteis['FP']['temperatura_R']=	self._conectaCLP.leFP(self._ClienteModbus,	700)/10
+        self._dadosUteis['FP']['temperatura_S']=	self._conectaCLP.leFP(self._ClienteModbus,	702)/10
+        self._dadosUteis['FP']['temperatura_T']=	self._conectaCLP.leFP(self._ClienteModbus,	704)/10
+        self._dadosUteis['FP']['temperatura_Carc']=	self._conectaCLP.leFP(self._ClienteModbus,	70)/10
         self._dadosUteis['4X']['corrente_R']=	self._conectaCLP.le4X(self._ClienteModbus,	840)/10
         self._dadosUteis['4X']['corrente_S']=	self._conectaCLP.le4X(self._ClienteModbus,	841)/10
         self._dadosUteis['4X']['corrente_T']=	self._conectaCLP.le4X(self._ClienteModbus,	842)/10
@@ -256,8 +256,8 @@ class Interface(BoxLayout):
         self.ids.pit3.text =str((self._dadosUteis['FP']['pressao_pit3']))+' Psi'
         self.ids.tit1.text =str((self._dadosUteis['FP']['temperatura_tit1']))+' ºC'
         self.ids.tit2.text =str((self._dadosUteis['FP']['temperatura_tit2']))+' ºC'
-        self.ids.tit3.text =str(round(self._dadosUteis['Valores']['ve.temperatura'],2))+' ºC'
-        self.ids.vazao.text =str(self._dadosUteis['Valores']['ve.vazao'])+' m³/h'
+        self.ids.tit3.text =str(round(self._dadosUteis['FP']['temp_ar_saida'],2))+' ºC'
+        self.ids.vazao.text =str(self._dadosUteis['FP']['vazao_saida'])+' m³/h'
         self.ids.vel.text =str(self._dadosUteis['FP']['velocidade_saida'])+' m/s'
 
         # self.ids.pit1.text =str((self._medidasTela['Valores']['ve.pit01'])/10)+' Psi'
@@ -265,8 +265,8 @@ class Interface(BoxLayout):
         # self.ids.pit3.text =str((self._medidasTela['Valores']['ve.pit03'])/10)+' Psi'
         # self.ids.tit1.text =str((self._medidasTela['Valores']['ve.tit01'])/10)+' ºC'
         # self.ids.tit2.text =str((self._medidasTela['Valores']['ve.tit02'])/10)+' ºC'
-        # self.ids.tit3.text =str(round(self._medidasTela['FP']['temp_ar_saida'],2))+' ºC'
-        # self.ids.vazao.text =str(self._medidasTela['FP']['vazao_saida'])+' m³/h'
+        # self.ids.tit3.text =str(round(self._medidasTela['Valores']['ve.temperatura'],2))+' ºC'
+        # self.ids.vazao.text =str(self._medidasTela['Valores']['ve.vazao'])+' m³/h'
         # self.ids.vel.text =str(self._medidasTela['Valores']['ve.velocidade'])+' m/s'
 
         #Valvulas
@@ -292,6 +292,7 @@ class Interface(BoxLayout):
         self._tempRSTCar.ids.temp_s.text =str(self._dadosUteis['FP']['temperatura_S'])+' ºC'
         self._tempRSTCar.ids.temp_t.text =str(self._dadosUteis['FP']['temperatura_T'])+' ºC'
         self._tempRSTCar.ids.carcaca.text =str(self._dadosUteis['FP']['temperatura_Carc'])+' ºC'
+
         # self._tempRSTCar.ids.temp_r.text =str((self._medidasTempRSTCar['Valores']['ve.temp_r'])/10)+' ºC'
         # self._tempRSTCar.ids.temp_s.text =str((self._medidasTempRSTCar['Valores']['ve.temp_s'])/10)+' ºC'
         # self._tempRSTCar.ids.temp_t.text =str((self._medidasTempRSTCar['Valores']['ve.temp_t'])/10)+' ºC'
@@ -394,7 +395,6 @@ class Interface(BoxLayout):
     #     self._conectaCLP.escreve4x(self._ClienteModbus, self._tagsVeneziana4X['ve.mv_escreve'],self.ids.slider.value)
 
     ####SLIDERS DE VELOCIDADE SÓ FUNCIONAM AO CLICAR EM LIGAR, FAZER METODO QUE OS ATUALIZA
-
 
     def venezianas(self, *args):
         self.ids.veneziana1.angle = args[1]

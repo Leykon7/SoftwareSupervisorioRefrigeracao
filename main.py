@@ -240,8 +240,8 @@ class Principal(App):
         self._widget.pararAtualizador()
 
 if __name__ == '__main__':
-    #Window.size=(1080, 720)
-    Window.fullscreen = 'auto'
+    Window.size=(1080, 720)
+    #Window.fullscreen = 'auto'
     Builder.load_string(open("interface.kv",encoding="utf-8").read(),rulesonly=True)
     Builder.load_string(open("popups.kv",encoding="utf-8").read(),rulesonly=True)
     Principal().run()
