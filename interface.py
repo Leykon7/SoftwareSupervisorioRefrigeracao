@@ -3,7 +3,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.animation import Animation
 from kivy.properties import NumericProperty
 import popups
-#from popups import comandoVent,medidasVent, comandoComp, ModbusPopup, ScanPopup, medidasComp, inversor, info
 from pyModbusTCP.client import ModbusClient
 from kivy.core.window import Window
 from threading import Thread
@@ -13,7 +12,7 @@ import random
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 #from pymodbus.payload import BinaryPayloadBuilder
-
+from modbuspersistencia import Persistencia
 
 class Interface(BoxLayout):
     """
@@ -30,8 +29,6 @@ class Interface(BoxLayout):
     _tagsAqueUmidTermo4X={}
     _tagsVeneziana4X = {}
 
-   
-
     def __init__(self,**kwargs):
         super().__init__()
         #Pega info
@@ -42,6 +39,9 @@ class Interface(BoxLayout):
         #Cliente Modbus
         self._ClienteModbus = ModbusClient(host=self._serverIP, port=self._port)
 
+        #Persistencia
+        self._persistencia = Persistencia()
+
         #Leituras
         self._medidasTela = {}
         self._medidasTela['Timestamp']=None
@@ -50,6 +50,10 @@ class Interface(BoxLayout):
         self._medidasTempRSTCar = {}
         self._medidasTempRSTCar['Timestamp']=None
         self._medidasTempRSTCar['Valores']={}
+        self._dadosUteis={}
+        self._dados2BD = {}
+        self._dadosUteis['4X']={}
+        self._dadosUteis['FP']={}
 
          #escritas
         self._escritas = {}
@@ -131,6 +135,7 @@ class Interface(BoxLayout):
                 self.lerDados()
                 self.atualizaInterface()
                 self.escreveDados()
+                self.insereNoBD()
                 #guardar todas escritas num dict por meio de um método
                 #Inserir no banco de dados
                 sleep(self._scan_time/1000)
@@ -158,32 +163,77 @@ class Interface(BoxLayout):
         Metodo de leitura de dados pelo protocolo modbus
         Atualiza o atributo medidas
         """
-        """
-        _escritas = {'4X':{'1500':5, '329':1 ...}, 'FP':{'20':5.7, ...}}
-
-        _tagsTelaFP= {'ve.pit': {'endereco': addr, 'color': cor_plot}
-
-        _medidasTela = {'Valores':{'ve.pit': 200psi, 've.tit': 25}, 'Timestamp':[Lista]}
-        
-        _tagsValvulas4X = {'ve.pit':502,'ve.tit':504, ....}
-
-        _valvulas = {'ve.xv':[0,0,1,0...], 've.xv':[0,0,1,0...], ...}
-    
-        """
         #Dados da tela
-        self._medidasTela['Timestamp'] = datetime.now()
-        for key,value in self._tagsTelaFP.items():
-            self._medidasTela['Valores'][key] = self._conectaCLP.leFP(self._ClienteModbus,value['endereco'])
+        # self._medidasTela['Timestamp'] = datetime.now()
+        # for key,value in self._tagsTelaFP.items():
+        #     self._medidasTela['Valores'][key] = self._conectaCLP.leFP(self._ClienteModbus,value['endereco'])
             
         #Leitura das Valvulas
         for key, value in self._tagsValvula4X.items():
             self._valvulas[key] = self._conectaCLP.leHRBits(self._ClienteModbus,value)
 
         #Leitura de temperatura dos enrolamentos do motor e carcaça
-        self._medidasTempRSTCar['Timestamp'] = datetime.now()
-        for key,value in self._tagsTempeRSTCarFP.items():
-            self._conectaCLP.leHRBits(self._ClienteModbus,value['endereco'])
-            self._medidasTempRSTCar['Valores'][key] = self._conectaCLP.leFP(self._ClienteModbus,value['endereco'])
+        # self._medidasTempRSTCar['Timestamp'] = datetime.now()
+        # for key,value in self._tagsTempeRSTCarFP.items():
+        #     self._conectaCLP.leHRBits(self._ClienteModbus,value['endereco'])
+        #     self._medidasTempRSTCar['Valores'][key] = self._conectaCLP.leFP(self._ClienteModbus,value['endereco'])
+
+        #Leitura de dados que vão para o bd
+        if self._comandoVent.ids.axial.active:
+            self._dadosUteis['4X']['tipo_motor']= 1
+        elif self._comandoVent.ids.radial.active:
+            self._dadosUteis['4X']['tipo_motor']= 2
+        if self._comandoComp.ids.hermetico.active:
+            self._dadosUteis['4X']['tipo_motor']= 1
+        elif self._comandoComp.ids.scroll.active:
+            self._dadosUteis['4X']['tipo_motor']= 2
+        self._dadosUteis['FP']['temperatura_tit1']=	self._conectaCLP.leFP(self._ClienteModbus,	1220)/10
+        self._dadosUteis['FP']['temperatura_tit2']=	self._conectaCLP.leFP(self._ClienteModbus,	1224)/10
+        self._dadosUteis['FP']['pressao_pit1']=	self._conectaCLP.leFP(self._ClienteModbus,	1218)/10
+        self._dadosUteis['FP']['pressao_pit2']=	self._conectaCLP.leFP(self._ClienteModbus,	1222)/10
+        self._dadosUteis['FP']['pressao_pit3']=	self._conectaCLP.leFP(self._ClienteModbus,	1226)/10
+        self._dadosUteis['FP']['vazao_saida']=	self._conectaCLP.leFP(self._ClienteModbus,	714)
+        self._dadosUteis['FP']['velocidade_saida']=	self._conectaCLP.leFP(self._ClienteModbus,	710)
+        self._dadosUteis['FP']['temp_ar_saida']=	self._conectaCLP.leFP(self._ClienteModbus,	712)
+        self._dadosUteis['FP']['freq_motor']=	self._conectaCLP.leFP(self._ClienteModbus,	884)
+        self._dadosUteis['FP']['torque_motor_axial']=	self._conectaCLP.leFP(self._ClienteModbus,	1424)
+        self._dadosUteis['FP']['torque_motor_radial']=	self._conectaCLP.leFP(self._ClienteModbus,	1422)
+        self._dadosUteis['FP']['temperatura_R']=	self._conectaCLP.leFP(self._ClienteModbus,	700)
+        self._dadosUteis['FP']['temperatura_S']=	self._conectaCLP.leFP(self._ClienteModbus,	702)
+        self._dadosUteis['FP']['temperatura_T']=	self._conectaCLP.leFP(self._ClienteModbus,	704)
+        self._dadosUteis['FP']['temperatura_Carc']=	self._conectaCLP.leFP(self._ClienteModbus,	70)
+        self._dadosUteis['4X']['corrente_R']=	self._conectaCLP.le4X(self._ClienteModbus,	840)/10
+        self._dadosUteis['4X']['corrente_S']=	self._conectaCLP.le4X(self._ClienteModbus,	841)/10
+        self._dadosUteis['4X']['corrente_T']=	self._conectaCLP.le4X(self._ClienteModbus,	842)/10
+        self._dadosUteis['4X']['corrente_N']=	self._conectaCLP.le4X(self._ClienteModbus,	843)/10
+        self._dadosUteis['4X']['corrente_Media']=	self._conectaCLP.le4X(self._ClienteModbus,	845)/10
+        self._dadosUteis['4X']['tensao_RS']=	self._conectaCLP.le4X(self._ClienteModbus,	847)/10
+        self._dadosUteis['4X']['tensao_ST']=	self._conectaCLP.le4X(self._ClienteModbus,	848)/10
+        self._dadosUteis['4X']['tensao_TR']=	self._conectaCLP.le4X(self._ClienteModbus,	849)/10
+        self._dadosUteis['4X']['potencia_ativa_R']=	self._conectaCLP.le4X(self._ClienteModbus,	852)
+        self._dadosUteis['4X']['potencia_ativa_S']=	self._conectaCLP.le4X(self._ClienteModbus,	853)
+        self._dadosUteis['4X']['potencia_ativa_T']=	self._conectaCLP.le4X(self._ClienteModbus,	854)
+        self._dadosUteis['4X']['potencia_ativa_Total']=	self._conectaCLP.le4X(self._ClienteModbus,	855)
+        self._dadosUteis['4X']['fp_R']=	self._conectaCLP.le4X(self._ClienteModbus,	868)/1000
+        self._dadosUteis['4X']['fp_S']=	self._conectaCLP.le4X(self._ClienteModbus,	869)/1000
+        self._dadosUteis['4X']['fp_T']=	self._conectaCLP.le4X(self._ClienteModbus,	870)/1000
+        self._dadosUteis['4X']['fp_Total']=	self._conectaCLP.le4X(self._ClienteModbus,	871)/1000
+        self._dadosUteis['4X']['corrente_R_co']=	self._conectaCLP.le4X(self._ClienteModbus,	726)/10
+        self._dadosUteis['4X']['corrente_S_co']=	self._conectaCLP.le4X(self._ClienteModbus,	727)/10
+        self._dadosUteis['4X']['corrente_T_co']=	self._conectaCLP.le4X(self._ClienteModbus,	728)/10
+        self._dadosUteis['4X']['corrente_N_co']=	self._conectaCLP.le4X(self._ClienteModbus,	729)/10
+        self._dadosUteis['4X']['corrente_Media_co']=	self._conectaCLP.le4X(self._ClienteModbus,	731)/10
+        self._dadosUteis['4X']['tensao_RS_co']=	self._conectaCLP.le4X(self._ClienteModbus,	732)/10
+        self._dadosUteis['4X']['tensao_ST_co']=	self._conectaCLP.le4X(self._ClienteModbus,	733)/10
+        self._dadosUteis['4X']['tensao_TR_co']=	self._conectaCLP.le4X(self._ClienteModbus,	734)/10
+        self._dadosUteis['4X']['potencia_ativa_R_co']=	self._conectaCLP.le4X(self._ClienteModbus,	735)
+        self._dadosUteis['4X']['potencia_ativa_S_co']=	self._conectaCLP.le4X(self._ClienteModbus,	736)
+        self._dadosUteis['4X']['potencia_ativa_T_co']=	self._conectaCLP.le4X(self._ClienteModbus,	737)
+        self._dadosUteis['4X']['potencia_ativa_Total_co']=	self._conectaCLP.le4X(self._ClienteModbus,	738)
+        self._dadosUteis['4X']['fp_R_co']=	self._conectaCLP.le4X(self._ClienteModbus,	747)/1000
+        self._dadosUteis['4X']['fp_S_co']=	self._conectaCLP.le4X(self._ClienteModbus,	748)/1000
+        self._dadosUteis['4X']['fp_T_co']=	self._conectaCLP.le4X(self._ClienteModbus,	749)/1000
+        self._dadosUteis['4X']['fp_Total_co']=	self._conectaCLP.le4X(self._ClienteModbus,	750)/1000
 
         #Leitura do status do motor e do driver
         ####FAZER COM QUE AS LEITURAS QUE JÁ ESTÃO NA BANCADA APARECAM NO PROGRAMA
@@ -200,14 +250,24 @@ class Interface(BoxLayout):
         Método que atualiza a interface gráfica a partir dos dados lidos
         """
         #Medidas da tela
-        self.ids.pit1.text =str((self._medidasTela['Valores']['ve.pit01'])/10)+' Psi'
-        self.ids.pit2.text =str((self._medidasTela['Valores']['ve.pit02'])/10)+' Psi'
-        self.ids.pit3.text =str((self._medidasTela['Valores']['ve.pit03'])/10)+' Psi'
-        self.ids.tit1.text =str((self._medidasTela['Valores']['ve.tit01'])/10)+' ºC'
-        self.ids.tit2.text =str((self._medidasTela['Valores']['ve.tit02'])/10)+' ºC'
-        self.ids.tit3.text =str(round(self._medidasTela['Valores']['ve.temperatura'],2))+' ºC'
-        self.ids.vazao.text =str(self._medidasTela['Valores']['ve.vazao'])+' m³/h'
-        self.ids.vel.text =str(self._medidasTela['Valores']['ve.velocidade'])+' m/s'
+
+        self.ids.pit1.text =str((self._dadosUteis['FP']['pressao_pit1']))+' Psi'
+        self.ids.pit2.text =str((self._dadosUteis['FP']['pressao_pit2']))+' Psi'
+        self.ids.pit3.text =str((self._dadosUteis['FP']['pressao_pit3']))+' Psi'
+        self.ids.tit1.text =str((self._dadosUteis['FP']['temperatura_tit1']))+' ºC'
+        self.ids.tit2.text =str((self._dadosUteis['FP']['temperatura_tit2']))+' ºC'
+        self.ids.tit3.text =str(round(self._dadosUteis['Valores']['ve.temperatura'],2))+' ºC'
+        self.ids.vazao.text =str(self._dadosUteis['Valores']['ve.vazao'])+' m³/h'
+        self.ids.vel.text =str(self._dadosUteis['FP']['velocidade_saida'])+' m/s'
+
+        # self.ids.pit1.text =str((self._medidasTela['Valores']['ve.pit01'])/10)+' Psi'
+        # self.ids.pit2.text =str((self._medidasTela['Valores']['ve.pit02'])/10)+' Psi'
+        # self.ids.pit3.text =str((self._medidasTela['Valores']['ve.pit03'])/10)+' Psi'
+        # self.ids.tit1.text =str((self._medidasTela['Valores']['ve.tit01'])/10)+' ºC'
+        # self.ids.tit2.text =str((self._medidasTela['Valores']['ve.tit02'])/10)+' ºC'
+        # self.ids.tit3.text =str(round(self._medidasTela['FP']['temp_ar_saida'],2))+' ºC'
+        # self.ids.vazao.text =str(self._medidasTela['FP']['vazao_saida'])+' m³/h'
+        # self.ids.vel.text =str(self._medidasTela['Valores']['ve.velocidade'])+' m/s'
 
         #Valvulas
         if self._valvulas['ve.xv_scroll.0'][1] == 1:
@@ -228,10 +288,21 @@ class Interface(BoxLayout):
             self.ids.xv5.source = 'imgs/ValvulaBranca.png'
 
         #Temperaturas R, S, T e Carcaça
-        self._tempRSTCar.ids.temp_r.text =str((self._medidasTempRSTCar['Valores']['ve.temp_r'])/10)+' ºC'
-        self._tempRSTCar.ids.temp_s.text =str((self._medidasTempRSTCar['Valores']['ve.temp_s'])/10)+' ºC'
-        self._tempRSTCar.ids.temp_t.text =str((self._medidasTempRSTCar['Valores']['ve.temp_t'])/10)+' ºC'
-        self._tempRSTCar.ids.carcaca.text =str((self._medidasTempRSTCar['Valores']['ve.temp_carc'])/10)+' ºC'
+        self._tempRSTCar.ids.temp_r.text =str(self._dadosUteis['FP']['temperatura_R'])+' ºC'
+        self._tempRSTCar.ids.temp_s.text =str(self._dadosUteis['FP']['temperatura_S'])+' ºC'
+        self._tempRSTCar.ids.temp_t.text =str(self._dadosUteis['FP']['temperatura_T'])+' ºC'
+        self._tempRSTCar.ids.carcaca.text =str(self._dadosUteis['FP']['temperatura_Carc'])+' ºC'
+        # self._tempRSTCar.ids.temp_r.text =str((self._medidasTempRSTCar['Valores']['ve.temp_r'])/10)+' ºC'
+        # self._tempRSTCar.ids.temp_s.text =str((self._medidasTempRSTCar['Valores']['ve.temp_s'])/10)+' ºC'
+        # self._tempRSTCar.ids.temp_t.text =str((self._medidasTempRSTCar['Valores']['ve.temp_t'])/10)+' ºC'
+        # self._tempRSTCar.ids.carcaca.text =str((self._medidasTempRSTCar['Valores']['ve.temp_carc'])/10)+' ºC'
+
+    def insereNoBD(self):
+        for key,value in self._dadosUteis['FP'].items():
+            self._dados2BD[key]=value
+        for key,value in self._dadosUteis['4X'].items():
+            self._dados2BD[key]=value
+        self._persistencia.guardar_dados(self._dados2BD)
 
     def Partida(self,tipo):
         if tipo == 1: #soft
@@ -317,7 +388,6 @@ class Interface(BoxLayout):
             self._status['comp'][1] = comando
             self._escritas['HRBits']['1328']= self._status['comp']
 
-            
     # def testeMoverVenezianas(self,*args):
     #     self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsVeneziana4X['ve.sel_pid'],1)
     #     ### FAZER DICT QUE ARMAZENA LEITURAS

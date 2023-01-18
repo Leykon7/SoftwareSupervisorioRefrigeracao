@@ -73,8 +73,6 @@ class comandoVent(Popup):
         gui = App.get_running_app().root.ids.gui
         gui.parent.Partida(tipo)
 
-    def comandoMotor(self,acao):
-        pass
 
 class TempRSTCar(Popup):
     pass
@@ -108,8 +106,9 @@ class medidasComp(Popup):
 
 class ats48(BoxLayout):
     """
-    Configurações do inversor
+    Configurações da partida soft
     """
+
 class atv31(BoxLayout):
     """
     configurações do inversor
