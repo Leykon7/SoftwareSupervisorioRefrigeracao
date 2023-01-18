@@ -53,29 +53,21 @@ class comandoVent(Popup):
     """
     Comandos dos Ventiladores
     """
-    _opcMainBox = None
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self._ats = ats48()
+        self._atv = atv31()
+
     def porOpcoes(self, tipo):
         self.limparOpc()
-        self._opcGrid = GridLayout(rows=2,cols=2,padding=7,spacing=7)
-        self._opcGrid.add_widget(Label(id=acc, text='[color=62718e]ACC (mín. 10s e máx. 60s)[/color]', markup=True))
-        self._opcGrid.add_widget(TextInput(halign='center',valign = 'middle',size_hint_x=0.4, center_x=0.5, center_y=0.5))
-        self._opcGrid.add_widget(Label(id='dcc', text='[color=62718e]DCC (mín. 10s e máx. 60s)[/color]', markup=True))
-        self._opcGrid.add_widget(TextInput(halign='center',valign = 'middle',size_hint_x=0.4, center_x=0.5, center_y=0.5))
-
-        self._opcBox = BoxLayout(size_hint_y=0.5, center_x=0.1,center_y=0.5, spacing=7)
-        self._opcBox.add_widget(Label(text='[color=62718e]Velocidade[/color]', markup=True))
-        self._opcBox.add_widget(TextInput(id='vel',halign='center',valign = 'middle', size_hint_y=0.75,size_hint_x=0.3, right=0.5))
-
-        self._opcMainBox = BoxLayout(orientation='vertical',spacing=7)
-        self._opcMainBox.add_widget(self._opcGrid)
-        if tipo:
-            self._opcMainBox.add_widget(Slider(orientation='horizontal', min=0, max=100, step=1, size_hint_y=0.25))
-        self._opcMainBox.add_widget(self._opcBox)
-        self.ids.opcoes.add_widget(self._opcMainBox)
+        if tipo == False:
+            self.ids.opcoes.add_widget(self._ats)
+        elif tipo == True:
+            self.ids.opcoes.add_widget(self._atv)
 
     def limparOpc(self):
-        if self._opcMainBox is not None:
-            self.ids.opcoes.remove_widget(self._opcMainBox)
+        self.ids.opcoes.remove_widget(self._ats)
+        self.ids.opcoes.remove_widget(self._atv)
 
     def partida(self, tipo):
         gui = App.get_running_app().root.ids.gui
@@ -91,6 +83,14 @@ class comandoComp(Popup):
     """
     Comandos do Scroll e Hermético
     """
+    _slider = None
+    def porOpc(self):
+        self.limparOpc()
+        self._slider = Slider(orientation='horizontal', size_hint_y=0.1, min=0, max=100, cursor_width=16, cursor_height=16)
+        self.ids.compOnze.add_widget(self._slider)
+    def limparOpc(self):
+        if self._slider is not None:
+            self.ids.compOnze.remove_widget(self._slider)
     pass
 
 class medidasVent(Popup):
@@ -106,8 +106,11 @@ class medidasComp(Popup):
     """
     pass
 
-class inversor(Popup):
+class ats48(BoxLayout):
     """
-    Configurações do Inversor
+    Configurações do inversor
     """
-    pass
+class atv31(BoxLayout):
+    """
+    configurações do inversor
+    """

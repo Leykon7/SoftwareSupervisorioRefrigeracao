@@ -188,13 +188,19 @@
                     pos: self.x-3,self.y-3
             TempBotao:
                 text:'Direto'
-                on_release: root.limparOpc()
+                on_release:
+                    root.limparOpc()
+                    app.root.Partida(3)
             TempBotao:
                 text:'inversor'
-                on_release: root.porOpcoes(True)
+                on_release:
+                    root.porOpcoes(True)
+                    app.root.Partida(2)
             TempBotao:
                 text:'soft'
-                on_release: root.porOpcoes(False)
+                on_release:
+                    root.porOpcoes(False)
+                    app.root.Partida(1)
         GridLayout:
             rows:2
             cols:3
@@ -371,7 +377,7 @@
             
 <comandoComp>:
     title: 'Comandos dos compressores'
-    size_hint:0.5,0.35
+    size_hint:0.5,0.4
     BoxLayout:
         orientation:'horizontal'
         padding:7
@@ -388,6 +394,7 @@
             spacing: [14,14]
             #11
             BoxLayout:
+                id: compOnze
                 orientation:'vertical'
                 padding:7
                 canvas:
@@ -405,7 +412,9 @@
                         id: hermetico
                         color: 98/255, 113/255, 142/255
                         group: 'compressores'
-                        on_active: app.root.sel_Comp(1)
+                        on_active:
+                            app.root.sel_Comp(1)
+                            root.limparOpc()
                     Label:
                         text:'Hermético'
                         color: 98/255, 113/255, 142/255
@@ -413,7 +422,9 @@
                         id: scroll
                         color: 98/255, 113/255, 142/255
                         group: 'compressores'
-                        on_active: app.root.sel_Comp(0)
+                        on_active:
+                            root.porOpc()
+                            app.root.sel_Comp(0)
                     Label:
                         text:'Scroll'
                         color: 98/255, 113/255, 142/255
@@ -658,6 +669,113 @@
                 font_size: 21
                 color: 98/255, 113/255, 142/255
                 halign:'right'
+
+<ats48>:
+    orientation: 'vertical'
+    spacing:7
+    id:atsBox
+    GridLayout:
+        rows:2
+        cols:2
+        padding:7
+        spacing:7
+        Label:
+            text:'ACC (mín. 10s e máx. 60s):'
+            color: 98/255, 113/255, 142/255
+        TextInput:
+            id:acc
+            halign:'center'
+            valign : 'middle'
+            size_hint_x:0.4
+            center_x:0.5
+            center_y:0.5
+        Label:
+            text:'DCC (mín. 10s e máx. 60s):'
+            color: 98/255, 113/255, 142/255
+        TextInput:
+            id:dcc
+            halign:'center'
+            valign : 'middle'
+            size_hint_x:0.4
+            center_x:0.5
+            center_y:0.5
+    BoxLayout:
+        orientation:'horizontal'
+        size_hint_y:0.5
+        center_x:0.1
+        center_y:0.5
+        spacing:7
+        Label:
+            text:'Velocidade:'
+            color: 98/255, 113/255, 142/255
+        TextInput:
+            id:vel
+            halign:'center'
+            valign : 'middle'
+            size_hint_y:0.75
+            size_hint_x:0.3
+            right:0.5
+
+<atv31>:
+    id:atvBox
+    orientation: 'vertical'
+    spacing:7
+    id:atsBox
+    GridLayout:
+        rows:2
+        cols:2
+        padding:7
+        spacing:7
+        Label:
+            text:'ACC (mín. 10s e máx. 60s):'
+            color: 98/255, 113/255, 142/255
+        TextInput:
+            id:acc
+            halign:'center'
+            valign : 'middle'
+            size_hint_x:0.4
+            center_x:0.5
+            center_y:0.5
+        Label:
+            text:'DCC (mín. 10s e máx. 60s):'
+            color: 98/255, 113/255, 142/255
+        TextInput:
+            id:dcc
+            halign:'center'
+            valign : 'middle'
+            size_hint_x:0.4
+            center_x:0.5
+            center_y:0.5
+    BoxLayout:
+        orientation:'horizontal'
+        size_hint_y:0.5
+        center_x:0.1
+        center_y:0.5
+        spacing:7
+        Label:
+            text:'Velocidade:'
+            color: 98/255, 113/255, 142/255
+        TextInput:
+            id:vel
+            halign:'center'
+            valign : 'middle'
+            size_hint_y:0.75
+            size_hint_x:0.3
+            right:0.5
+    Slider:
+        orientation:'horizontal'
+        min:0
+        max:100
+        step:1
+        size_hint_y:0.25
+
+
+    # self._opcMainBox = BoxLayout(orientation='vertical',spacing=7)
+    #     self._opcMainBox.add_widget(self._opcGrid)
+    #     if tipo:
+    #         self._opcMainBox.add_widget(Slider(orientation='horizontal', min=0, max=100, step=1, size_hint_y=0.25))
+    #     self._opcMainBox.add_widget(self._opcBox)
+
 
 <TempBotao@Button>:
     background_normal: ''

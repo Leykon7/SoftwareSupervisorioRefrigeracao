@@ -235,9 +235,9 @@ class Principal(App):
         xv hermetico e scroll : valvulas ----- informa automaticamente pra xv1 e xv2?
         """
         return self._widget
-
+    
     def on_stop(self):
-            self._widget.pararAtualizador()
+        self._widget.pararAtualizador()
 
 if __name__ == '__main__':
     Window.size=(1080, 720)

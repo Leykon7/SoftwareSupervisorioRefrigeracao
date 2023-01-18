@@ -19,7 +19,6 @@ class Interface(BoxLayout):
     """
     Widget Principal da Applicação
     """
-    
     _updateThread = None
     _updateWidgets = True
     _tags = {} #teste
@@ -30,6 +29,8 @@ class Interface(BoxLayout):
     _tagsMotor4X = {}
     _tagsAqueUmidTermo4X={}
     _tagsVeneziana4X = {}
+
+   
 
     def __init__(self,**kwargs):
         super().__init__()
@@ -50,9 +51,18 @@ class Interface(BoxLayout):
         self._medidasTempRSTCar['Timestamp']=None
         self._medidasTempRSTCar['Valores']={}
 
+         #escritas
+        self._escritas = {}
+        self._escritas['4X'] ={}
+        self._escritas['FP'] ={}
+        self._escritas['HRBits']={}
+
+        #Leitura de status
+        self._status = {}
+
+        ### usar apenas duas bibliotecas, uma para ações e outra de leituras
+
         ##Dá cor e salva no dict _tags
-        """ cor_plot =(random.random(),random.random(),random.random(),1)
-                self._tags[key] = {'endereco': value, 'color': cor_plot} """
         for key, value in kwargs.get('endTelaFP').items():
             cor_plot=(random.random(),random.random(),random.random(),1)
             self._tagsTelaFP[key] = {'endereco': value, 'color': cor_plot}
@@ -75,8 +85,10 @@ class Interface(BoxLayout):
 
         for key, value in kwargs.get('endVeneziana').items():
             self._tagsVeneziana4X[key] = value
-            
+        
+        #Metodo de escrita e leitura
         self._conectaCLP = conectaCLP()
+
         #Popups
         self._ModbusPopup = popups.ModbusPopup(self._serverIP,self._port)
         self._ScanPopup = popups.ScanPopup(self._scan_time)
@@ -118,6 +130,7 @@ class Interface(BoxLayout):
             while self._updateWidgets:
                 self.lerDados()
                 self.atualizaInterface()
+                self.escreveDados()
                 #guardar todas escritas num dict por meio de um método
                 #Inserir no banco de dados
                 sleep(self._scan_time/1000)
@@ -129,13 +142,25 @@ class Interface(BoxLayout):
     def pararAtualizador(self):
         self._updateWidgets = False
 
+    def escreveDados(self):
+        """
+        Método que escreve todos os dados da iteração
+        """
+        for key,value in self._escritas['4X'].items():
+            self._conectaCLP.escreve4x(self._ClienteModbus,int(key),value)
+        for key,value in self._escritas['HRBits'].items():
+            self._conectaCLP.escreveHRBits(self._ClienteModbus,int(key),value)   
+        for key,value in self._escritas['FP'].items():
+            self._conectaCLP.escreveFP(self._ClienteModbus,int(key),value)      
+
     def lerDados(self):
         """
         Metodo de leitura de dados pelo protocolo modbus
         Atualiza o atributo medidas
         """
-
         """
+        _escritas = {'4X':{'1500':5, '329':1 ...}, 'FP':{'20':5.7, ...}}
+
         _tagsTelaFP= {'ve.pit': {'endereco': addr, 'color': cor_plot}
 
         _medidasTela = {'Valores':{'ve.pit': 200psi, 've.tit': 25}, 'Timestamp':[Lista]}
@@ -154,12 +179,22 @@ class Interface(BoxLayout):
         for key, value in self._tagsValvula4X.items():
             self._valvulas[key] = self._conectaCLP.leHRBits(self._ClienteModbus,value)
 
-        #Leitura de temperatura dos enrolamentos e carcaça
+        #Leitura de temperatura dos enrolamentos do motor e carcaça
         self._medidasTempRSTCar['Timestamp'] = datetime.now()
         for key,value in self._tagsTempeRSTCarFP.items():
             self._conectaCLP.leHRBits(self._ClienteModbus,value['endereco'])
             self._medidasTempRSTCar['Valores'][key] = self._conectaCLP.leFP(self._ClienteModbus,value['endereco'])
-        
+
+        #Leitura do status do motor e do driver
+        ####FAZER COM QUE AS LEITURAS QUE JÁ ESTÃO NA BANCADA APARECAM NO PROGRAMA
+        self._status['driver'] = self._conectaCLP.le4X(self._ClienteModbus,1324)
+        self._status['motorInversor'] = self._conectaCLP.le4X(self._ClienteModbus,1312)
+        self._status['motorSoft'] = self._conectaCLP.le4X(self._ClienteModbus,1316)
+        self._status['motorDireta'] = self._conectaCLP.le4X(self._ClienteModbus,1319)
+        self._status['aqueUmi'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1329)
+        self._status['comp'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1328)
+        self._status['velScroll'] = self._conectaCLP.le4X(self._ClienteModbus, 1236)
+
     def atualizaInterface(self):
         """
         Método que atualiza a interface gráfica a partir dos dados lidos
@@ -200,18 +235,17 @@ class Interface(BoxLayout):
 
     def Partida(self,tipo):
         if tipo == 1: #soft
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.sel_driver'],tipo)
+            self._escritas['4X']['1324']=tipo
         elif tipo == 2: #inversor
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.sel_driver'],tipo)
+            self._escritas['4X']['1324']=tipo
         elif tipo == 3: #direta
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.sel_driver'],tipo)
+            self._escritas['4X']['1324']=tipo
 
     def comandoMotor(self,comando):
         if comando ==0: #desligar
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsMotor4X['ve.atv31'],comando)
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsMotor4X['ve.ats48'],comando)
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsMotor4X['ve.ats48'],comando)
-
+            self._escritas['4X']['1312']=comando
+            self._escritas['4X']['1316']=comando
+            self._escritas['4X']['1319']=comando
         elif comando == 1: #ligar
             ### botar rendimento do motor
             #Trocar animação das helices
@@ -227,77 +261,71 @@ class Interface(BoxLayout):
                 self.ids.hel0.stop()
 
             #se o motor estiver ligado, desliga
-            if self._conectaCLP.le4X(self._ClienteModbus,self._tagsMotor4X['ve.atv31']) or self._conectaCLP.le4X(self._ClienteModbus,self._tagsMotor4X['ve.atv31']) or self._conectaCLP.le4X(self._ClienteModbus,self._tagsMotor4X['ve.atv31']) == 1:
-                self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.atv31'],0)
-                self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.ats48'],0)
-                self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.ats48'],0)
+            if self._status['motorInversor'] or self._status['motorSoft'] or self._status['motorDireta'] ==1:
+                self._escritas['4X']['1312']=comando
+                self._escritas['4X']['1316']=comando
+                self._escritas['4X']['1319']=comando
 
             #Lê o driver escolhido e liga o motor
             ##caso soft
-            if self._conectaCLP.le4X(self._ClienteModbus,self._tagsPartida4X['ve.indica_driver']) == 1:
-                self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.ats48_acc'],self._comandoVent.ids.acc.text)
-                self._ClienteModbus.write_single_register(self._tagsPartida4X['ve.ats48_dcc'],self._comandoVent.ids.dcc.text)
-                self._ClienteModbus.write_single_register(self._tagsMotor4X['ve.ats48'],1)
+            if self._status['driver'] == 1:
+                self._escritas['4X']['1317']=self._comandoVent.ids.acc.text
+                self._escritas['4X']['1318']=self._comandoVent.ids.dcc.text
+                self._escritas['4X']['1316']=comando
             ##caso inversor
-            elif self._conectaCLP.le4X(self._ClienteModbus,self._tagsPartida4X['ve.indica_driver']) == 2:
-                self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.atv31_acc'],self._comandoVent.ids.acc.text)
-                self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.atv31_dcc'],self._comandoVent.ids.dcc.text)
-                self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.atv31_velocidade'],self._comandoVent.ids.vel.text)
-                self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsMotor4X['ve.atv31'],comando)
+            elif self._status['driver'] == 2:
+                self._escritas['4X']['1314']=self._comandoVent.ids.acc.text
+                self._escritas['4X']['1315']=self._comandoVent.ids.dcc.text
+                self._escritas['4X']['1313']=self._comandoVent.ids.vel.text
+                self._escritas['4X']['1312']=comando
+
             ##caso direta
-            elif self._conectaCLP.le4X(self._ClienteModbus,self._tagsPartida4X['ve.indica_driver']) == 3:
-                self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsMotor4X['ve.tesys'],comando)
+            elif self._status['driver'] == 3:
+                self._escritas['4X']['1319']=comando
         
         elif comando == 2: #resetar
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.atv31'],comando)
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.ats48'],comando)
-            self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsPartida4X['ve.ats48'],comando) 
+            self._escritas['4X']['1312']=comando
+            self._escritas['4X']['1316']=comando
+            self._escritas['4X']['1319']=comando
 
     def comandoAqueUmi(self,comando,maq):
-        lista = self._conectaCLP.leHRBits(self._ClienteModbus, 1329)
         if comando == 1: #ligar
-            lista[maq] = 1
-            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1329,lista)
+            self._status['aqueUmi'][maq] = comando
+            self._escritas['HRBits']['1329']= self._status['aqueUmi']
         if comando == 0: #ligar
-            lista[maq] = 0
-            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1329,lista)
+            self._status['aqueUmi'][maq] = comando
+            self._escritas['HRBits']['1329']= self._status['aqueUmi']
 
     def comandoComp(self, comando):
         if comando == 0: # desligar
-            lista = self._conectaCLP.leHRBits(self._ClienteModbus, 1329)
-            lista[0] = comando
-            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1329,lista)
+            self._status['aqueUmi'][0] = comando
+            self._escritas['HRBits']['1329']= self._status['aqueUmi']
         elif comando == 1: #ligar
-            lista = self._conectaCLP.leHRBits(self._ClienteModbus, 1328)
-            lista[4] = 1
-            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1328,lista)
-# ADICIONAR VELOCIDADE DO SCROLL!
+            self._escritas['4X']['1236'] = self._comandoComp.children.ids.comOnze.children[0].value
+            self._status['comp'][4] = comando
+            self._escritas['HRBits']['1328']= self._status['comp']
+
     def sel_Comp(self, comando):
-        lista = self._conectaCLP.leHRBits(self._ClienteModbus, 1328)
+        """
+        Seleciona o tipo de compressor
+        """
         if comando == 0: # scroll
-            lista[1] = comando
-            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1328,lista)
+            self._status['comp'][1] = comando
+            self._escritas['HRBits']['1328']= self._status['comp']
+
         elif comando == 1: #hermetico
-            lista[1] = 1
-            self._conectaCLP.escreveHRBits(self._ClienteModbus, 1328,lista)
+            self._status['comp'][1] = comando
+            self._escritas['HRBits']['1328']= self._status['comp']
+
             
-    def testeMoverVenezianas(self,*args):
-        self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsVeneziana4X['ve.sel_pid'],1)
-        ### FAZER DICT QUE ARMAZENA LEITURAS
-        self._conectaCLP.escreve4x(self._ClienteModbus, self._tagsVeneziana4X['ve.mv_escreve'],self.ids.slider.value)
-        #ERRO : 
-        """
-        File "<string>", line 366, in <module>
-   File "c:\Users\Esteira\Downloads\SoftwareSupervisorioRefrigeracao-master\interface.py", line 287, in testeMoverVenezianas    
-     self._conectaCLP.escreve4x(self._ClienteModbus, self._tagsVeneziana4X['ve.mv_escreve'],self.ids.slider.value)
-   File "c:\Users\Esteira\Downloads\SoftwareSupervisorioRefrigeracao-master\interface.py", line 327, in escreve4x
-     cliente.write_single_register(endereco,valor)
-   File "C:\Users\Esteira\AppData\Local\Programs\Python\Python310\lib\site-packages\pyModbusTCP\client.py", line 506, in write_single_register
-     raise ValueError('reg_value out of range (valid from 0 to 65535)')
- ValueError: reg_value out of range (valid from 0 to 65535)
-        """
-        pass
-        
+    # def testeMoverVenezianas(self,*args):
+    #     self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsVeneziana4X['ve.sel_pid'],1)
+    #     ### FAZER DICT QUE ARMAZENA LEITURAS
+    #     self._conectaCLP.escreve4x(self._ClienteModbus, self._tagsVeneziana4X['ve.mv_escreve'],self.ids.slider.value)
+
+    ####SLIDERS DE VELOCIDADE SÓ FUNCIONAM AO CLICAR EM LIGAR, FAZER METODO QUE OS ATUALIZA
+
+
     def venezianas(self, *args):
         self.ids.veneziana1.angle = args[1]
         self.ids.veneziana2.angle = args[1]
@@ -340,7 +368,6 @@ class conectaCLP(ModbusClient):
     def escreveHRBits(self,cliente,endereco,valor):
         valor16bits = int("".join(str(i) for i in valor),2)
         cliente.write_single_register(endereco,valor16bits)
-        pass
 
     def escreveFP(self,cliente,endereco,valor):
         pass
