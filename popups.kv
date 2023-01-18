@@ -310,7 +310,7 @@
 
 <medidasVent>:
     title: 'Medidas dos ventiladores'
-    size_hint:0.25,0.25
+    size_hint:0.5,0.75
     BoxLayout:
         orientation:'vertical'
         padding:14
@@ -329,38 +329,129 @@
                 Rectangle:
                     size: self.width+3,self.height+3
                     pos: self.x-3,self.y-3
+
             GridLayout:
                 cols:2
-                rows:1
-                size_hint_y: 0.33
-                padding:7
-                Label:
-                    text: 'Medidas'
-                    color: 98/255, 113/255, 142/255
-                Label:
-                    text:'Medida Média'
-                    color: 98/255, 113/255, 142/255
-            GridLayout:
-                cols:2
-                rols:2
+                rows:16
                 spacing:7
-                padding: 7                        
-                TempBotao:
-                    text:'Tensão'
-                    #on_release: root.teste()
+                padding: 7 
+                #correntes                       
                 Label:
-                    id: tensaoMVent
-                    text:'110 V'
+                    text:'Corrente R:'
                     color: 98/255, 113/255, 142/255
-                TempBotao:
-                    text:'Corrente'
-                    #on_release: root.teste()
                 Label:
-                    text: '10 A'
+                    id:corrente_R_co
+                    text:'-.- A'
                     color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Corrente S:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:corrente_S_co
+                    text:'-.- A'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Corrente T:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:corrente_T_co
+                    text:'-.- A'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Corrente N:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:corrente_N_co
+                    text:'-.- A'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Corrente média:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:corrente_media_co
+                    text:'-.- A'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Tensão RS:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:tensao_RS_co
+                    text:'-.- V'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Tensão ST:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:tensao_ST_co
+                    text:'-.- V'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Tensão TR:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:tensao_TR_co
+                    text:'-.- V'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Potência Ativa R:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:potencia_ativa_R
+                    text:'-.- W'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Potencia ativa S:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:potencia_ativa_S
+                    text:'-.- W'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Potencia ativa T:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:potencia_ativa_T
+                    text:'-.- W'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Potencia ativa total:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:potencia_ativa_Total
+                    text:'-.- W'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Fator de potencia R:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:fp_R
+                    text:'-.-'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Fator de potencia S:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:fp_S
+                    text:'-.-'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Fator de potencia T:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:fp_T
+                    text:'-.-'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Fator de potencia total:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:fp_Total
+                    text:'-.-'
+                    color: 98/255, 113/255, 142/255
+
         BoxLayout:
             orientation:'vertical'
-            size_hint:0.5,0.5
+            size_hint:0.5,0.125
             padding:7
             pos_hint: {'center_x': 0.5, 'center_y':0.5}
             canvas:
@@ -372,8 +463,8 @@
             TempBotao:
                 text:'Fechar'
                 pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                pos_hint: {'center_x': 0.5, 'center_y':0.5}
                 on_release: root.dismiss()
-            
             
 <comandoComp>:
     title: 'Comandos dos compressores'
@@ -445,10 +536,11 @@
                     color: 98/255, 113/255, 142/255
                 TempBotao:
                     text:'Ligar'
-                    on_release: app.root.comandoAqueUmi(1,2)
+                    on_release: app.root.comandoUmi(1)
                 TempBotao:
                     text:'Desligar' 
-                    on_release: app.root.comandoAqueUmi(1,3)
+                    on_release: app.root.comandoUmi(0)
+
             #13
             BoxLayout:
                 orientation:'vertical'
@@ -465,10 +557,12 @@
                     color: 98/255, 113/255, 142/255
                 TempBotao:
                     text:'Ligar'
-                    on_release: app.root.comandoAqueUmi(1,4)
+                    on_release: app.root.comandoAque1(1)
                 TempBotao:
                     text:'Desligar'
-                    on_release: app.root.comandoAqueUmi(1,5)
+                    on_release: app.root.comandoAque1(0)
+
+                    
 
             #21
             BoxLayout:
@@ -483,10 +577,10 @@
                         pos: self.x-3,self.y-3
                 TempBotao:
                     text:'Ligar'
-                    on_release:app.root.comandoComp(1)
+                    on_release: app.root.comandoComp(1)
                 TempBotao:
                     text:'Desligar'
-                    on_release:app.root.comandoComp(0)
+                    on_release: app.root.comandoComp(0)
 
             #22
             BoxLayout:
@@ -528,14 +622,14 @@
                     color: 98/255, 113/255, 142/255
                 TempBotao:
                     text:'Ligar'
-                    on_release: app.root.comandoAqueUmi(1,6)
+                    on_release: app.root.comandoAque2(1)
                 TempBotao:
-                    text:'Desligar' 
-                    on_release: app.root.comandoAqueUmi(1,7)
+                    text:'Desligar'
+                    on_release: app.root.comandoAque2(0)
 
 <medidasComp>:
     title: 'Medidas dos Compressores'
-    size_hint:0.25,0.25
+    size_hint:0.5,0.75
     BoxLayout:
         orientation:'vertical'
         padding:14
@@ -554,38 +648,129 @@
                 Rectangle:
                     size: self.width+3,self.height+3
                     pos: self.x-3,self.y-3
+
             GridLayout:
                 cols:2
-                rows:1
-                size_hint_y: 0.33
-                padding:7
-                Label:
-                    text: 'Medidas'
-                    color: 98/255, 113/255, 142/255
-                Label:
-                    text:'Medida Média'
-                    color: 98/255, 113/255, 142/255
-            GridLayout:
-                cols:2
-                rols:2
+                rows:16
                 spacing:7
-                padding: 7                        
-                TempBotao:
-                    text:'Tensão'
-                    #on_release: root.teste()
+                padding: 7 
+                #correntes                       
                 Label:
-                    id: tensaoMVent
-                    text:'110 V'
+                    text:'Corrente R:'
                     color: 98/255, 113/255, 142/255
-                TempBotao:
-                    text:'Corrente'
-                    #on_release: root.teste()
                 Label:
-                    text: '10 A'
+                    id:corrente_R_co
+                    text:'-.- A'
                     color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Corrente S:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:corrente_S_co
+                    text:'-.- A'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Corrente T:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:corrente_T_co
+                    text:'-.- A'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Corrente N:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:corrente_N_co
+                    text:'-.- A'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Corrente média:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:corrente_media_co
+                    text:'-.- A'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Tensão RS:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:tensao_RS_co
+                    text:'-.- V'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Tensão ST:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:tensao_ST_co
+                    text:'-.- V'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Tensão TR:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:tensao_TR_co
+                    text:'-.- V'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Potência Ativa R:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:potencia_ativa_R
+                    text:'-.- W'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Potencia ativa S:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:potencia_ativa_S
+                    text:'-.- W'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Potencia ativa T:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:potencia_ativa_T
+                    text:'-.- W'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Potencia ativa total:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:potencia_ativa_Total
+                    text:'-.- W'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Fator de potencia R:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:fp_R
+                    text:'-.-'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Fator de potencia S:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:fp_S
+                    text:'-.-'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Fator de potencia T:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:fp_T
+                    text:'-.-'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Fator de potencia total:'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    id:fp_Total
+                    text:'-.-'
+                    color: 98/255, 113/255, 142/255
+
         BoxLayout:
             orientation:'vertical'
-            size_hint:0.5,0.5
+            size_hint:0.5,0.125
             padding:7
             pos_hint: {'center_x': 0.5, 'center_y':0.5}
             canvas:
@@ -684,6 +869,7 @@
             color: 98/255, 113/255, 142/255
         TextInput:
             id:acc
+            text: '10'
             halign:'center'
             valign : 'middle'
             size_hint_x:0.4
@@ -694,6 +880,7 @@
             color: 98/255, 113/255, 142/255
         TextInput:
             id:dcc
+            text: '10'
             halign:'center'
             valign : 'middle'
             size_hint_x:0.4

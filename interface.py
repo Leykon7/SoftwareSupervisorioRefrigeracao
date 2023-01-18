@@ -26,7 +26,7 @@ class Interface(BoxLayout):
     _tagsTempeRSTCarFP = {}
     _tagsPartida4X = {}
     _tagsMotor4X = {}
-    _tagsAqueUmidTermo4X={}
+    _tagsaque_umi_comdTermo4X={}
     _tagsVeneziana4X = {}
 
     def __init__(self,**kwargs):
@@ -78,14 +78,14 @@ class Interface(BoxLayout):
         for key, value in kwargs.get('endValvulas4X').items():
             self._tagsValvula4X[key] = value
 
-        for key, value in kwargs.get('endPartida4X').items():
-            self._tagsPartida4X[key] = value
+        # for key, value in kwargs.get('endPartida4X').items():
+        #     self._tagsPartida4X[key] = value
 
-        for key, value in kwargs.get('endMotor4X').items():
-            self._tagsMotor4X[key] = value
+        # for key, value in kwargs.get('endMotor4X').items():
+        #     self._tagsMotor4X[key] = value
 
-        for key, value in kwargs.get('endAqueUmidTerm4X').items():
-            self._tagsAqueUmidTermo4X[key] = value
+        # for key, value in kwargs.get('endaque_umi_comdTerm4X').items():
+        #     self._tagsaque_umi_comdTermo4X[key] = value
 
         for key, value in kwargs.get('endVeneziana').items():
             self._tagsVeneziana4X[key] = value
@@ -101,6 +101,8 @@ class Interface(BoxLayout):
         self._medidasTelaComp = popups.medidasComp()
         self._comandoComp = popups.comandoComp()
         self._tempRSTCar = popups.TempRSTCar()
+        self._ats48 = popups.ats48()
+        self._atv31 = popups.atv31()
                 
     def iniciaColetaDados(self,ip,port):
         """
@@ -241,9 +243,14 @@ class Interface(BoxLayout):
         self._status['motorInversor'] = self._conectaCLP.le4X(self._ClienteModbus,1312)
         self._status['motorSoft'] = self._conectaCLP.le4X(self._ClienteModbus,1316)
         self._status['motorDireta'] = self._conectaCLP.le4X(self._ClienteModbus,1319)
-        self._status['aqueUmi'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1329)
+        self._status['aque_umi_com'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1329)
         self._status['comp'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1328)
         self._status['velScroll'] = self._conectaCLP.le4X(self._ClienteModbus, 1236)
+        self._status['pressao_comp'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1230)
+        self._status['veneziana'] = self._conectaCLP.leFP(self._ClienteModbus,1310)
+        #print('veneziana: '+ str(self._status['veneziana']))
+        self._status['pid'] = self._conectaCLP.le4X(self._ClienteModbus,722)
+        #print('pid: '+ str(self._status['pid']))
 
     def atualizaInterface(self):
         """
@@ -257,9 +264,15 @@ class Interface(BoxLayout):
         self.ids.tit1.text =str((self._dadosUteis['FP']['temperatura_tit1']))+' ºC'
         self.ids.tit2.text =str((self._dadosUteis['FP']['temperatura_tit2']))+' ºC'
         self.ids.tit3.text =str(round(self._dadosUteis['FP']['temp_ar_saida'],2))+' ºC'
-        self.ids.vazao.text =str(self._dadosUteis['FP']['vazao_saida'])+' m³/h'
-        self.ids.vel.text =str(self._dadosUteis['FP']['velocidade_saida'])+' m/s'
-
+        self.ids.vazao.text =str(round(self._dadosUteis['FP']['vazao_saida'],2))+' m³/h'
+        self.ids.vel.text =str(round(self._dadosUteis['FP']['velocidade_saida'],2))+' m/s'
+        
+        if self._status['pressao_comp'][4] == 1:
+            self.ids.st_hermetico.text = 'Alta pressao'
+            
+        if self._status['pressao_comp'][5] == 1:
+            self.ids.st_hermetico.text = 'Alta pressao'
+        
         # self.ids.pit1.text =str((self._medidasTela['Valores']['ve.pit01'])/10)+' Psi'
         # self.ids.pit2.text =str((self._medidasTela['Valores']['ve.pit02'])/10)+' Psi'
         # self.ids.pit3.text =str((self._medidasTela['Valores']['ve.pit03'])/10)+' Psi'
@@ -270,10 +283,10 @@ class Interface(BoxLayout):
         # self.ids.vel.text =str(self._medidasTela['Valores']['ve.velocidade'])+' m/s'
 
         #Valvulas
-        if self._valvulas['ve.xv_scroll.0'][1] == 1:
+        if self._valvulas['ve.xv_scroll.0'][15] == 1:
             self.ids.xv1.source = 'imgs/ValvulaAzul.png'
             self.ids.xv3.source = 'imgs/ValvulaAzul.png'
-        elif self._valvulas['ve.xv_hermetico.1'][1]==1:
+        elif self._valvulas['ve.xv_hermetico.1'][14]==1:
             self.ids.xv2.source = 'imgs/ValvulaAzul.png'
             self.ids.xv4.source = 'imgs/ValvulaAzul.png'
         else:
@@ -282,7 +295,7 @@ class Interface(BoxLayout):
             self.ids.xv2.source = 'imgs/ValvulaBranca.png'
             self.ids.xv4.source = 'imgs/ValvulaBranca.png'
             
-        if self._valvulas['ve.xv5.7'][7]== 1:
+        if self._valvulas['ve.xv5.7'][8]== 1:
             self.ids.xv5.source = 'imgs/ValvulaAzul.png'
         else:
             self.ids.xv5.source = 'imgs/ValvulaBranca.png'
@@ -312,6 +325,7 @@ class Interface(BoxLayout):
             self._escritas['4X']['1324']=tipo
         elif tipo == 3: #direta
             self._escritas['4X']['1324']=tipo
+        self._status['driver']=tipo
 
     def comandoMotor(self,comando):
         if comando ==0: #desligar
@@ -332,23 +346,24 @@ class Interface(BoxLayout):
                 self.ids.hel1.start()
                 self.ids.hel0.stop()
 
-            #se o motor estiver ligado, desliga
+            # #se o motor estiver ligado, desliga
             if self._status['motorInversor'] or self._status['motorSoft'] or self._status['motorDireta'] ==1:
                 self._escritas['4X']['1312']=comando
                 self._escritas['4X']['1316']=comando
                 self._escritas['4X']['1319']=comando
 
-            #Lê o driver escolhido e liga o motor
-            ##caso soft
+            # #Lê o driver escolhido e liga o motor
+            # ##caso soft
             if self._status['driver'] == 1:
-                self._escritas['4X']['1317']=self._comandoVent.ids.acc.text
-                self._escritas['4X']['1318']=self._comandoVent.ids.dcc.text
+                #print(self._status['driver'])
+                self._escritas['4X']['1317']=int(self._ats48.ids.acc.text)
+                self._escritas['4X']['1318']=int(self._ats48.ids.dcc.text)
                 self._escritas['4X']['1316']=comando
-            ##caso inversor
+            # ##caso inversor
             elif self._status['driver'] == 2:
-                self._escritas['4X']['1314']=self._comandoVent.ids.acc.text
-                self._escritas['4X']['1315']=self._comandoVent.ids.dcc.text
-                self._escritas['4X']['1313']=self._comandoVent.ids.vel.text
+                self._escritas['4X']['1314']=int(self._atv31.ids.acc.text)/10
+                self._escritas['4X']['1315']=int(self._atv31.ids.dcc.text)/10
+                #self._escritas['4X']['1313']=self._comandoVent.ids.vel.text
                 self._escritas['4X']['1312']=comando
 
             ##caso direta
@@ -360,46 +375,108 @@ class Interface(BoxLayout):
             self._escritas['4X']['1316']=comando
             self._escritas['4X']['1319']=comando
 
-    def comandoAqueUmi(self,comando,maq):
+    def comandoUmi(self,comando):
         if comando == 1: #ligar
-            self._status['aqueUmi'][maq] = comando
-            self._escritas['HRBits']['1329']= self._status['aqueUmi']
-        if comando == 0: #ligar
-            self._status['aqueUmi'][maq] = comando
-            self._escritas['HRBits']['1329']= self._status['aqueUmi']
+            self._status['aque_umi_com'][13] = 0
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+            
 
+            self._status['aque_umi_com'][12] = 1
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+            
+        if comando == 0: #desligar
+            
+            self._status['aque_umi_com'][12] = 1
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+            
+            self._status['aque_umi_com'][13] = 0
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+
+            # [0  1   2   3   4   5   6    7    8   9   10   11   12   13   14   15]
+            # [15 14  13  12  11  10  9    8    7   6    5    4    3    2    1    0] byte
+            
+    def comandoAque1(self,comando,):
+        if comando == 1: #ligar
+            self._status['aque_umi_com'][11] = 0
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+                        
+            self._status['aque_umi_com'][10] = 1
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+            
+        if comando == 0: #desligar
+            
+            self._status['aque_umi_com'][11] = 1
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+                        
+            self._status['aque_umi_com'][10] = 0
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+            
+    def comandoAque2(self,comando,):
+        if comando == 1: #ligar
+            self._status['aque_umi_com'][9] = 0
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+                        
+            self._status['aque_umi_com'][8] = 1
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+            
+        if comando == 0: #desligar
+            
+            self._status['aque_umi_com'][9] = 1
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+                        
+            self._status['aque_umi_com'][8] = 0
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+            
+        
+            
     def comandoComp(self, comando):
         if comando == 0: # desligar
-            self._status['aqueUmi'][0] = comando
-            self._escritas['HRBits']['1329']= self._status['aqueUmi']
-        elif comando == 1: #ligar
-            self._escritas['4X']['1236'] = self._comandoComp.children.ids.comOnze.children[0].value
-            self._status['comp'][4] = comando
+            self._status['aque_umi_com'][15] = 0
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+            self._status['comp'][11] = 0
             self._escritas['HRBits']['1328']= self._status['comp']
-
+            
+        elif comando == 1: #ligar
+            #self._escritas['4X']['1236'] = self._comandoComp.children.ids.comOnze.children[0].value
+            self._status['comp'][11] = 1
+            self._escritas['HRBits']['1328']= self._status['comp']
+            self._status['aque_umi_com'][15] = 1
+            self._escritas['HRBits']['1329']= self._status['aque_umi_com']
+            
     def sel_Comp(self, comando):
         """
         Seleciona o tipo de compressor
         """
         if comando == 0: # scroll
-            self._status['comp'][1] = comando
+            
+            #print(self._status['comp'])
+            #print(self._status['comp'][1])
+            self._status['comp'][14] = comando
             self._escritas['HRBits']['1328']= self._status['comp']
 
         elif comando == 1: #hermetico
-            self._status['comp'][1] = comando
+            
+            #print(self._status['comp'])
+            #
+            # print(self._status['comp'][1])
+            self._status['comp'][14] = comando
             self._escritas['HRBits']['1328']= self._status['comp']
-
-    # def testeMoverVenezianas(self,*args):
-    #     self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsVeneziana4X['ve.sel_pid'],1)
-    #     ### FAZER DICT QUE ARMAZENA LEITURAS
-    #     self._conectaCLP.escreve4x(self._ClienteModbus, self._tagsVeneziana4X['ve.mv_escreve'],self.ids.slider.value)
+    
+    def testeMoverVenezianas(self):
+        print((self.ids.slider.value))
+        self._escritas['4X']['1332'] = 1
+        self._escritas['FP']['1310'] = self.ids.slider.value
+        print(self._escritas['FP']['1310'])
+        #self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsVeneziana4X['ve.sel_pid'],1)
+        ### FAZER DICT QUE ARMAZENA LEITURAS
+        #self._conectaCLP.escreve4x(self._ClienteModbus, self._tagsVeneziana4X['ve.mv_escreve'],self.ids.slider.value)
 
     ####SLIDERS DE VELOCIDADE SÓ FUNCIONAM AO CLICAR EM LIGAR, FAZER METODO QUE OS ATUALIZA
 
     def venezianas(self, *args):
-        self.ids.veneziana1.angle = args[1]
-        self.ids.veneziana2.angle = args[1]
-        self.ids.veneziana3.angle = args[1]
+        self.ids.veneziana1.angle = (-1)*(args[1]/100)*90
+        self.ids.veneziana2.angle = (-1)*(args[1]/100)*90
+        self.ids.veneziana3.angle = (-1)*(args[1]/100)*90
 
     def checkboxes(self,vent):
         if vent == 1:
