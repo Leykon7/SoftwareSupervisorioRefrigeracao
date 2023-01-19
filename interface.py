@@ -233,41 +233,60 @@ class Interface(BoxLayout):
         self.ids.vazao.text =str(round(self._dadosUteis['FP']['vazao_saida'],2))+' m³/h'
         self.ids.vel.text =str(round(self._dadosUteis['FP']['velocidade_saida'],2))+' m/s'
         
-        #Status compressores
+        #Status da pressão nos tubos dos compressores
         if self._status['pressao_comp'][11] == 1:
             #self.ids.boxcomp.canvas.children[0].rgb= [1,0,0,1]
             self.ids.st_scroll.text ='Alta pressão'
             self.ids.st_scroll.color = (1,0,0,1)
         else:
             self.ids.st_scroll.text =''
+            self.ids.st_scroll.color = (1,1,1,1)
             # self.ids.boxcomp.canvas.children[0].rgb = [0,1,0,1]
                         
         if self._status['pressao_comp'][10] == 1:
             #self.ids.boxcomp.canvas.children[0].rgb = [1,0,0,1]
             self.ids.st_hermetico.text = 'Alta pressao'
-            self.ids.st_scroll.color = (1,0,0,1)
+            self.ids.st_hermetico.color = (1,0,0,1)
         else:
-            self.ids.st_scroll.text =''
+            self.ids.st_hermetico.text =''
+            self.ids.st_hermetico.color = (1,1,1,1)
 
             #self.ids.boxcomp.canvas.children[0].rgb = [0,1,0,1]
 
-        #compressor
-        if self._status['comp'][14] == 0: #scroll
-            if self._status['aque_umi_com'][15] and self._status['comp'][11] == 0:
-                self.ids.st_scroll.text ='DESLIGADO'
-                self.ids.st_scroll.color = (1,1,1,1)
+        #status dos compressores
+        if self._status['aque_umi_com'][15] and self._status['comp'][11] == 0: #Desligado
+            self.ids.st_scroll.text ='DESLIGADO'
+            self.ids.st_scroll.color = (1,1,1,1)
+            self.ids.st_hermetico.text ='DESLIGADO'
+            self.ids.st_hermetico.color = (1,1,1,1)
                 
-            elif self._status['comp'][11] and self._status['aque_umi_com'][15] == 1:
+        elif self._status['comp'][11] and self._status['aque_umi_com'][15] == 1: #Ligado
+            if self._status['comp'][14] == 0: #scroll
                 self.ids.st_scroll.text ='LIGADO'
                 self.ids.st_scroll.color = (1,0,0,1)
-        if self._status['comp'][14] == 1: #hermetico
-            if self._status['aque_umi_com'][15] and self._status['comp'][11] == 0:
-                self.ids.st_hermetico.text ='DESLIGADO'
-                self.ids.st_hermetico.color = (1,1,1,1)
-                
-            elif self._status['comp'][11] and self._status['aque_umi_com'][15] == 1:
+            if self._status['comp'][14] == 1: #hermetico
                 self.ids.st_hermetico.text ='LIGADO'
                 self.ids.st_hermetico.color = (1,0,0,1)
+
+
+        # if self._status['comp'][14] == 0: #scroll
+        #     if self._status['aque_umi_com'][15] and self._status['comp'][11] == 0: #Desligado
+        #         self.ids.st_scroll.text ='DESLIGADO'
+        #         self.ids.st_scroll.color = (1,1,1,1)
+                
+        #     elif self._status['comp'][11] and self._status['aque_umi_com'][15] == 1: #Desligado
+        #         self.ids.st_scroll.text ='LIGADO'
+        #         self.ids.st_scroll.color = (1,0,0,1)
+
+                
+        # if self._status['comp'][14] == 1: #hermetico
+        #     if self._status['aque_umi_com'][15] and self._status['comp'][11] == 0:
+        #         self.ids.st_hermetico.text ='DESLIGADO'
+        #         self.ids.st_hermetico.color = (1,1,1,1)
+                
+        #     elif self._status['comp'][11] and self._status['aque_umi_com'][15] == 1:
+        #         self.ids.st_hermetico.text ='LIGADO'
+        #         self.ids.st_hermetico.color = (1,0,0,1)
 
 
         #veneziana
