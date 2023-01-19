@@ -158,7 +158,6 @@ class grafico(Graph):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._plot = MeshLinePlot(color=[1, 0, 0, 1])
-        self._mylist = []
         self._tamnho = 0
         self._listtuple = []
 
@@ -167,23 +166,19 @@ class grafico(Graph):
             self.ids.grafico.xmax = self.ids.grafico.xmax + 1
             self.ids.grafico.xmin = self.ids.grafico.xmin + 1        
 
-    def update_points(self):
+    def update_points(self,pontos):
         #self.plot.points = [(i,i)]
         #self.plot.points = [i for i in self._mylist]
-        self._listtuple.append((self._tamnho,self._mylist[self._tamnho-1]))
+        self._listtuple.append((self._tamnho,pontos[self._tamnho-1]))
         self._plot.points = self._listtuple
         self.ids.grafico.add_plot(self._plot)
 
-    def atualizaMylist(self):
-        self._mylist.append(random.randrange(int(0),int(100)))
+    def atualizaTamanho(self,pontos):
+        self._tamnho = len(pontos)
 
-    def atualizaTamanho(self):
-        self._tamnho = len(self._mylist)
-
-    def atualizadorGrafico(self):
-        self.atualizaMylist()
-        self.atualizaTamanho()
-        self.update_points()
+    def atualizadorGrafico(self,pontos):
+        self.atualizaTamanho(pontos)
+        self.update_points(pontos)
         self.update_xaxis()
 
 class bdPopup(Popup):

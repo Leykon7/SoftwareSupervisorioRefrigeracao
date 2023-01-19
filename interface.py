@@ -6,6 +6,7 @@ import popups
 from pyModbusTCP.client import ModbusClient
 from kivy.core.window import Window
 from threading import Thread
+from threading import Lock
 from time import sleep
 from datetime import datetime
 import random
@@ -31,6 +32,8 @@ class Interface(BoxLayout):
         #Cliente Modbus
         self._ClienteModbus = ModbusClient(host=self._serverIP, port=self._port)
 
+        #self = Helices
+
         #Persistencia
         self._persistencia = Persistencia()
 
@@ -45,6 +48,7 @@ class Interface(BoxLayout):
         self._status = {}
 
          #escritas
+        self._st_helice = False
         self._escritas = {}
         self._escritas['4X'] ={}
         self._escritas['FP'] ={}
@@ -222,7 +226,7 @@ class Interface(BoxLayout):
 
         self.ids.pit1.text =str((self._dadosUteis['FP']['pressao_pit1']))+' Psi'
         self.ids.pit2.text =str((self._dadosUteis['FP']['pressao_pit2']))+' Psi'
-        self.ids.pit3.text =str((self._dadosUteis['FP']['pressao_pit3']))+' Psi'
+        self.ids.pit3.text =str((self._dadosUteis['FP']['pressao_pit3']))+' mmH2O'
         self.ids.tit1.text =str((self._dadosUteis['FP']['temperatura_tit1']))+' ºC'
         self.ids.tit2.text =str((self._dadosUteis['FP']['temperatura_tit2']))+' ºC'
         self.ids.tit3.text =str(round(self._dadosUteis['FP']['temp_ar_saida'],2))+' ºC'
@@ -233,46 +237,66 @@ class Interface(BoxLayout):
         if self._status['pressao_comp'][11] == 1:
             #self.ids.boxcomp.canvas.children[0].rgb= [1,0,0,1]
             self.ids.st_scroll.text ='Alta pressão'
+            self.ids.st_scroll.color = (1,0,0,1)
         else:
-            # self.ids.st_scroll.text ='DESLIGADO'
+            self.ids.st_scroll.text =''
             # self.ids.boxcomp.canvas.children[0].rgb = [0,1,0,1]
-            pass
-            
+                        
         if self._status['pressao_comp'][10] == 1:
             #self.ids.boxcomp.canvas.children[0].rgb = [1,0,0,1]
             self.ids.st_hermetico.text = 'Alta pressao'
+            self.ids.st_scroll.color = (1,0,0,1)
         else:
-            #self.ids.st_scroll.text ='DESLIGADO'
+            self.ids.st_scroll.text =''
+
             #self.ids.boxcomp.canvas.children[0].rgb = [0,1,0,1]
-            pass
+
+        #compressor
+        if self._status['comp'][14] == 0: #scroll
+            if self._status['aque_umi_com'][15] and self._status['comp'][11] == 0:
+                self.ids.st_scroll.text ='DESLIGADO'
+                self.ids.st_scroll.color = (1,1,1,1)
+                
+            elif self._status['comp'][11] and self._status['aque_umi_com'][15] == 1:
+                self.ids.st_scroll.text ='LIGADO'
+                self.ids.st_scroll.color = (1,0,0,1)
+        if self._status['comp'][14] == 1: #hermetico
+            if self._status['aque_umi_com'][15] and self._status['comp'][11] == 0:
+                self.ids.st_hermetico.text ='DESLIGADO'
+                self.ids.st_hermetico.color = (1,1,1,1)
+                
+            elif self._status['comp'][11] and self._status['aque_umi_com'][15] == 1:
+                self.ids.st_hermetico.text ='LIGADO'
+                self.ids.st_hermetico.color = (1,0,0,1)
+
 
         #veneziana
         #self.ids.slider.value = self._status['veneziana2']
        
         #Valvulas
         if self._status['ValScrollHermetico'][15] == 1:
-            self.ids.xv1.source = 'imgs/ValvulaAzul.png'
-            self.ids.xv3.source = 'imgs/ValvulaAzul.png'
-        elif self._status['ValScrollHermetico'][14]==1:
-            self.ids.xv2.source = 'imgs/ValvulaAzul.png'
-            self.ids.xv4.source = 'imgs/ValvulaAzul.png'
-        else:
             self.ids.xv1.source = 'imgs/ValvulaBranca.png'
             self.ids.xv3.source = 'imgs/ValvulaBranca.png'
+        elif self._status['ValScrollHermetico'][14]==1:
             self.ids.xv2.source = 'imgs/ValvulaBranca.png'
             self.ids.xv4.source = 'imgs/ValvulaBranca.png'
+        else:
+            self.ids.xv1.source = 'imgs/ValvulaAzul.png'
+            self.ids.xv3.source = 'imgs/ValvulaAzul.png'
+            self.ids.xv2.source = 'imgs/ValvulaAzul.png'
+            self.ids.xv4.source = 'imgs/ValvulaAzul.png'
             
         if self._status['Val5'][8]== 1:
-            self.ids.xv5.source = 'imgs/ValvulaAzul.png'
-        else:
             self.ids.xv5.source = 'imgs/ValvulaBranca.png'
+        else:
+            self.ids.xv5.source = 'imgs/ValvulaAzul.png'
 
-        #ataualiza ventilador
-        if self._dadosUteis['4X']['status_ats48'] or self._dadosUteis['4X']['status_ats31'] or self._dadosUteis['4X']['status_tesys'] == 1:
+        #atualiza ventilador
+        if self._status['status_ats48'] or self._status['status_ats31'] or self._status['status_tesys'] == 1:
             self.estadoHelices(1,self._comandoVent.ids.axial.active)
-        elif self._dadosUteis['4X']['status_ats48'] and self._dadosUteis['4X']['status_ats31'] and self._dadosUteis['4X']['status_tesys'] == 0:
+        elif self._status['status_ats48'] and self._status['status_ats31'] and self._status['status_tesys'] == 0:
             self.estadoHelices(0,self._comandoVent.ids.axial.active)
-        elif self._dadosUteis['4X']['status_ats48'] and self._dadosUteis['4X']['status_ats31'] and self._dadosUteis['4X']['status_tesys'] == 2:
+        elif self._status['status_ats48'] and self._status['status_ats31'] and self._status['status_tesys'] == 2:
             self.estadoHelices(0,self._comandoVent.ids.axial.active)
 
         #Temperaturas R, S, T e Carcaça
@@ -488,22 +512,32 @@ class Interface(BoxLayout):
 
     def estadoHelices(self,vent,tipo):
         if  vent == 1:
-            if tipo:
-                self.ids.helice0.source ='imgs/helicebaixadaAzul.png'
-                self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
-                self.ids.hel0.start()
-                self.ids.hel1.stop()
-            else:
-                self.ids.helice1.source ='imgs/helicebaixadaAzul.png'
-                self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
-                self.ids.hel1.start()
-                self.ids.hel0.stop()
+            if tipo == True:
+                #self.ids.hel0.pos_hint = {'x':-0.38, 'y':0.296}
+                #self.ids.helice0.source ='imgs/helicebaixadaAzul.png'
+                #self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
+                if self._st_helice == False:
+                    self._st_helice = self.ids.hel0.start()
+                #self.ids.hel1.stop()
+            elif tipo == False:
+                #self.ids.helice1.source ='imgs/helicebaixadaAzul.png'
+                #self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
+                if self._st_helice == False:
+                    self._st_helice = self.ids.hel0.start()
+                #self.ids.hel0.stop()
         elif vent == 0:
-            self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
-            self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
-            self.ids.hel1.stop()
-            self.ids.hel0.stop()
+            #self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
+            #self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
+            #self.ids.hel1.stop()
+            if self._st_helice == True:
+                self._st_helice = self.ids.hel0.stop()
 
+    def checkboxHelice(self, tipo):
+        if tipo == False:
+            self.ids.hel0.pos_hint = {'x':-0.38, 'y':0.296}
+        else:
+            self.ids.hel0.pos_hint = {'x':-0.3835, 'y':0.1}
+            
 
 class conectaCLP(ModbusClient):
 
@@ -556,7 +590,28 @@ class Helices(FloatLayout):
         
     def start(self):
         self.anim.start(self)
+        return True
 
     def stop(self):
         self.anim.stop(self)
         self.angle = 0
+        return False
+
+    # def estadoHelices(self,vent,tipo):
+    #     if  vent == 1:
+    #         if tipo:
+    #             self.ids.helice0.source ='imgs/helicebaixadaAzul.png'
+    #             self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
+    #             self.ids.hel0.start()
+    #             self.ids.hel1.stop()
+    #             self._lock.release()
+    #         else:
+    #             self.ids.helice1.source ='imgs/helicebaixadaAzul.png'
+    #             self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
+    #             self.ids.hel1.start()
+    #             self.ids.hel0.stop()
+    #     elif vent == 0:
+    #         self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
+    #         self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
+    #         self.ids.hel1.stop()
+    #         self.ids.hel0.stop()

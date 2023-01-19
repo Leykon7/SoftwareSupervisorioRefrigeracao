@@ -223,6 +223,7 @@
                     id:axial
                     group: 'ventilador'
                     color: 98/255, 113/255, 142/255
+                    on_active:app.root.checkboxHelice(False)
                 Label:
                     text:'Axial'
                     color: 98/255, 113/255, 142/255
@@ -234,6 +235,7 @@
                     id:radial
                     group: 'ventilador'
                     color: 98/255, 113/255, 142/255
+                    on_active:app.root.checkboxHelice(True)
                 Label:
                     text:'Radial'
                     color: 98/255, 113/255, 142/255
@@ -302,7 +304,7 @@
                     size: self.width+3,self.height+3
                     pos: self.x-3,self.y-3
             TempBotao:
-                text:'fechar'
+                text:'Fechar'
                 on_release: root.dismiss()
                 pos_hint:{'center_x':0.5,'center_y':0.5}
         
