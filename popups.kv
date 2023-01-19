@@ -170,10 +170,10 @@
                     size: self.width+3,self.height+3
                     pos: self.x-3,self.y-3
             TempBotao:
-                text:'desligar'
+                text:'Desligar'
                 on_release: app.root.comandoMotor(0)
             TempBotao:
-                text:'resetar'
+                text:'Resetar'
         BoxLayout:
             orientation:'vertical'
             spacing:7
@@ -340,56 +340,56 @@
                     text:'Corrente R:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:corrente_R_co
+                    id:corrente_R
                     text:'-.- A'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Corrente S:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:corrente_S_co
+                    id:corrente_S
                     text:'-.- A'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Corrente T:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:corrente_T_co
+                    id:corrente_T
                     text:'-.- A'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Corrente N:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:corrente_N_co
+                    id:corrente_N
                     text:'-.- A'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Corrente média:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:corrente_media_co
+                    id:corrente_Media
                     text:'-.- A'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Tensão RS:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:tensao_RS_co
+                    id:tensao_RS
                     text:'-.- V'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Tensão ST:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:tensao_ST_co
+                    id:tensao_ST
                     text:'-.- V'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Tensão TR:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:tensao_TR_co
+                    id:tensao_TR
                     text:'-.- V'
                     color: 98/255, 113/255, 142/255
                 Label:
@@ -504,7 +504,7 @@
                         color: 98/255, 113/255, 142/255
                         group: 'compressores'
                         on_active:
-                            app.root.sel_Comp(1)
+                            app.root.selmp(1)
                             root.limparOpc()
                     Label:
                         text:'Hermético'
@@ -687,7 +687,7 @@
                     text:'Corrente média:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:corrente_media_co
+                    id:corrente_Media_co
                     text:'-.- A'
                     color: 98/255, 113/255, 142/255
                 Label:
@@ -715,56 +715,56 @@
                     text:'Potência Ativa R:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:potencia_ativa_R
+                    id:potencia_ativa_R_co
                     text:'-.- W'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Potencia ativa S:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:potencia_ativa_S
+                    id:potencia_ativa_S_co
                     text:'-.- W'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Potencia ativa T:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:potencia_ativa_T
+                    id:potencia_ativa_T_co
                     text:'-.- W'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Potencia ativa total:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:potencia_ativa_Total
+                    id:potencia_ativa_Total_co
                     text:'-.- W'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Fator de potencia R:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:fp_R
+                    id:fp_R_co
                     text:'-.-'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Fator de potencia S:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:fp_S
+                    id:fp_S_co
                     text:'-.-'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Fator de potencia T:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:fp_T
+                    id:fp_T_co
                     text:'-.-'
                     color: 98/255, 113/255, 142/255
                 Label:
                     text:'Fator de potencia total:'
                     color: 98/255, 113/255, 142/255
                 Label:
-                    id:fp_Total
+                    id:fp_Total_co
                     text:'-.-'
                     color: 98/255, 113/255, 142/255
 
@@ -859,49 +859,35 @@
     orientation: 'vertical'
     spacing:7
     id:atsBox
-    GridLayout:
-        rows:2
-        cols:2
+    size_hint_y:0.25
+    BoxLayout:
+        orientation:'vertical'
         padding:7
         spacing:7
-        Label:
-            text:'ACC (mín. 10s e máx. 60s):'
-            color: 98/255, 113/255, 142/255
-        TextInput:
-            id:acc
-            text: '10'
-            halign:'center'
-            valign : 'middle'
-            size_hint_x:0.4
-            center_x:0.5
-            center_y:0.5
-        Label:
-            text:'DCC (mín. 10s e máx. 60s):'
-            color: 98/255, 113/255, 142/255
-        TextInput:
-            id:dcc
-            text: '10'
-            halign:'center'
-            valign : 'middle'
-            size_hint_x:0.4
-            center_x:0.5
-            center_y:0.5
-    BoxLayout:
-        orientation:'horizontal'
-        size_hint_y:0.5
-        center_x:0.1
-        center_y:0.5
-        spacing:7
-        Label:
-            text:'Velocidade:'
-            color: 98/255, 113/255, 142/255
-        TextInput:
-            id:vel
-            halign:'center'
-            valign : 'middle'
-            size_hint_y:0.75
-            size_hint_x:0.3
-            right:0.5
+        BoxLayout:
+            orientation:'horizontal'
+            Label:
+                text:'ACC (mín. 10s e máx. 60s):'
+                color: 98/255, 113/255, 142/255
+                center_x:0.5
+                center_y:0.5
+            TextInput:
+                id:acc
+                text: '10'
+                halign:'center'
+                valign : 'middle'
+                size_hint:0.4,0.5
+        BoxLayout:
+            orientation:'horizontal'
+            Label:
+                text:'DCC (mín. 10s e máx. 60s):'
+                color: 98/255, 113/255, 142/255
+            TextInput:
+                id:dcc
+                text: '10'
+                halign:'center'
+                valign : 'middle'
+                size_hint:0.4,0.5
 
 <atv31>:
     id:atvBox
@@ -944,17 +930,21 @@
             color: 98/255, 113/255, 142/255
         TextInput:
             id:vel
+            text:'0'
             halign:'center'
             valign : 'middle'
             size_hint_y:0.75
             size_hint_x:0.3
             right:0.5
+            on_text:root.atualizaslider()
     Slider:
+        id:velslider
         orientation:'horizontal'
         min:0
         max:100
         step:1
         size_hint_y:0.25
+        on_touch_up:root.slider()
 
 <popupgrafico>:
     title: 'Gráfico'
@@ -1058,7 +1048,7 @@
             cols:3
             padding:7
             spacing:7
-            size_hint_y:0.25
+            size_hint_y:0.16
             canvas:
                 Color:
                     rgb:203/255, 208/255, 219/255
@@ -1082,10 +1072,10 @@
                 spacing:7
                 TextInput:
                     id:inicial
-                    halign:'center'
+                    valign:'middle'
                 TextInput:
                     id:final
-                    halign:'center'
+                    valign:'middle'
 
             BoxLayout:
                 orientation:'vertical'

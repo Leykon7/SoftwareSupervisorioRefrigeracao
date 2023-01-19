@@ -8,6 +8,7 @@ from kivy.uix.slider import Slider
 from kivy.app import App
 from kivy.garden.graph import Graph, MeshLinePlot
 from modbuspersistencia import Persistencia
+import random
 
 class ModbusPopup(Popup):
     """
@@ -26,9 +27,6 @@ class ModbusPopup(Popup):
         self._info.ids.info.add_widget(self._infoLabel)
         self._info.open()
 
-    # def conexao(self):
-    #     if self.ids.conBut.text =='Conectar':
-    #         pass
 
 class info(Popup):
     """
@@ -114,6 +112,17 @@ class atv31(BoxLayout):
     """
     configurações do inversor
     """
+    def slider(self):
+        self.ids.vel.text = str(float(self.ids.velslider.value))
+
+    def atualizaslider(self):
+        if self.ids.vel.text == '':
+            self.ids.velslider.value = 0    
+            self.ids.text = '0'
+        elif int(float(self.ids.vel.text))>100:
+             self.ids.velslider.value =100
+        else:
+            self.ids.velslider.value = int(float(self.ids.vel.text))    
 
 class popupgrafico(Popup):
     """
@@ -127,46 +136,55 @@ class popupgrafico(Popup):
         self.plot2 = MeshLinePlot(color=[0,1,0,1])
         self.plot3 = MeshLinePlot(color=[0,0,1,1])
     
-        self._plot = MeshLinePlot(color=[1, 0, 0, 1])
-        self._mylist = []
-        self._tamnho = 0
-        self._listtuple = []
+    def addGrafico(self):
+        if self.grafAdcnd:
+            self.removeGrafico()
+        self.ids.areagrafico.add_widget(self._graficoW)
+        self.grafAdcnd = True
 
-    # def update_xaxis(self,*args):
-    #     # self.ids.grafico.xmin = self.ids.grafico.xmin + 1/4
-    #     # self.ids.grafico.xmax = self.ids.grafico.xmax + 1/2
-    #     # self.ids.grafico.x_ticks_major = self.ids.grafico.xmax/4
-    #     self.naodeixagraficosumir()
-    #     #self.ids.grafico.x_axis
-
-    # def naodeixagraficosumir(self):
-    #     if (self.ids.grafico.xmax - self.ids.grafico.xmin)*(3/4) < self._tamnho:
-    #         self.ids.grafico.xmax = self.ids.grafico.xmax + 1
-    #         self.ids.grafico.xmin = self.ids.grafico.xmin + 1
-
-    # def update_points(self,*args):
-    #     #self.plot.points = [(i,i)]
-    #     #self.plot.points = [i for i in self._mylist]
-    #     self._listtuple.append((self._tamnho,self._mylist[self._tamnho-1]))
-    #     self._plot.points = self._listtuple
-    #     self.ids.grafico.add_plot(self._plot)
-
-    # def atualizaMylist(self,*args):
-    #     self._mylist.append(random.randrange(int(0),int(100)))
-
-    # def atualizaTamanho(self,*args):
-    #     self._tamnho = len(self._mylist)
-
-    # def atualizador(self,*args):
-    #     Clock.schedule_interval(self.atualizaMylist, 1.)
-    #     Clock.schedule_interval(self.atualizaTamanho, 1.)
-    #     Clock.schedule_interval(self.update_points, 1.)
-    #     Clock.schedule_interval(self.update_xaxis, 1.)
+    def removeGrafico(self):
+        if self.grafAdcnd:
+            self.ids.areagrafico.remove_widget(self._graficoW)
+       
+        # Clock.schedule_interval(self.atualizaMylist, 1.)
+        # Clock.schedule_interval(self.atualizaTamanho, 1.)
+        # Clock.schedule_interval(self.update_points, 1.)
+        # Clock.schedule_interval(self.update_xaxis, 1.)
 
 class grafico(Graph):
     """
     grafico
     """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._plot = MeshLinePlot(color=[1, 0, 0, 1])
+        self._mylist = []
+        self._tamnho = 0
+        self._listtuple = []
+
+    def update_xaxis(self):
+        if (self.ids.grafico.xmax - self.ids.grafico.xmin)*(3/4) < self._tamnho:
+            self.ids.grafico.xmax = self.ids.grafico.xmax + 1
+            self.ids.grafico.xmin = self.ids.grafico.xmin + 1        
+
+    def update_points(self):
+        #self.plot.points = [(i,i)]
+        #self.plot.points = [i for i in self._mylist]
+        self._listtuple.append((self._tamnho,self._mylist[self._tamnho-1]))
+        self._plot.points = self._listtuple
+        self.ids.grafico.add_plot(self._plot)
+
+    def atualizaMylist(self):
+        self._mylist.append(random.randrange(int(0),int(100)))
+
+    def atualizaTamanho(self):
+        self._tamnho = len(self._mylist)
+
+    def atualizadorGrafico(self):
+        self.atualizaMylist()
+        self.atualizaTamanho()
+        self.update_points()
+        self.update_xaxis()
 
 class bdPopup(Popup):
     """

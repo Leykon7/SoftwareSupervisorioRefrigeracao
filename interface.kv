@@ -63,34 +63,6 @@
                 text:'DESCONECTADO'
                 color: 98/255, 113/255, 142/255
         #Ventiladores Comandos
-        CheckBox:
-            id: checkboxAxial
-            color: 98/255, 113/255, 142/255
-            size_hint: 0.05,0.05
-            pos_hint: {'x':0.037, 'y':0.485}
-            group: 'ventiladoran'
-            active: True
-            on_active: root.checkboxes(0)
-        
-        Label:
-            text: 'Axial'
-            pos_hint: {'x':0.052, 'y':0.487}
-            size_hint: 0.065, 0.04
-            color: 98/255, 113/255, 142/255
-        CheckBox:
-            id: checkboxRadial
-            color: 98/255, 113/255, 142/255
-            size_hint: 0.05,0.05
-            pos_hint: {'x':0.137, 'y':0.485}
-            group: 'ventiladoran'
-            on_active: 
-                root.checkboxes(1)
-                root.testeMoverVenezianas()
-        Label:
-            text: 'Radial'
-            pos_hint: {'x':0.152, 'y':0.487}
-            size_hint: 0.065, 0.04
-            color: 98/255, 113/255, 142/255
         Button:
             text: 'Comando'
             size_hint: 0.065, 0.04
@@ -118,19 +90,21 @@
                 root._medidasTelaVent.open()
         #Compressores
         BoxLayout:
+            id:boxcomp
             orientation:'vertical'
             padding:7
             pos_hint:{'center_x':0.176,'center_y':0.15}
             size_hint:0.08,0.05
             canvas:
                 Color:
+                    id:hermetico
                     rgb:133/255, 146/255, 171/255
                 Rectangle:
                     size: self.size
                     pos: self.pos
             Label:
                 id: st_hermetico
-                text:'DESLIGADO'
+                text:''
                 bold: True
         BoxLayout:
             orientation:'vertical'
@@ -139,20 +113,15 @@
             size_hint:0.08,0.05
             canvas:
                 Color:
+                    id:scroll
                     rgb:133/255, 146/255, 171/255
                 Rectangle:
                     size: self.size
                     pos: self.pos
             Label:
                 id: st_scroll
-                text:'LIGADO'
+                text:''
                 bold: True
-        CheckBox:
-            id: scroll
-            color: 98/255, 113/255, 142/255
-            size_hint: 0.05,0.05
-            pos_hint: {'x':0.075, 'y':0.293}
-            group: 'compressores'
         Button:
             text: 'Comando'
             size_hint: 0.065, 0.04
@@ -176,12 +145,7 @@
             on_release: 
                 self.background_color= (133/255, 146/255, 171/255)
                 root._medidasTelaComp.open()
-        CheckBox:
-            color: 98/255, 113/255, 142/255
-            size_hint: 0.05,0.05
-            pos_hint: {'x':0.075, 'y':0.093}
-            group: 'compressores'
-        
+
         #Valvulas
         Image:
             id: xv1
@@ -422,21 +386,16 @@
         #TemperaturaRST
         BoxLayout:
             orientation:'vertical'
-            pos_hint: {'x':0.265, 'y':0.5}
+            pos_hint: {'x':0.143, 'y':0.49}
             size_hint: 0.065, 0.04
-            canvas:
-                Color:
-                    rgb:203/255, 208/255, 219/255
-                Rectangle:
-                    size: self.width+14,self.height+14
-                    pos: self.x-7,self.y-7
+
             TempBotao: 
                 text:'Temperatura'
                 on_release: root._tempRSTCar.open()
         #grafico        
         BoxLayout:
             orientation:'vertical'
-            pos_hint: {'x':0.265, 'y':0.45}
+            pos_hint: {'x':0.68, 'y':0.65}
             size_hint: 0.065, 0.04
             canvas:
                 Color:
@@ -450,8 +409,8 @@
         #BD
         BoxLayout:
             orientation:'vertical'
-            pos_hint: {'x':0.35, 'y':0.45}
-            size_hint: 0.065, 0.04
+            pos_hint: {'x':0.77, 'y':0.65}
+            size_hint: 0.075, 0.04
             canvas:
                 Color:
                     rgb:203/255, 208/255, 219/255

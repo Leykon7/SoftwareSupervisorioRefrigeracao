@@ -11,7 +11,7 @@ from datetime import datetime
 import random
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
-#from pymodbus.payload import BinaryPayloadBuilder
+from pymodbus.payload import BinaryPayloadBuilder
 from modbuspersistencia import Persistencia
 
 class Interface(BoxLayout):
@@ -20,14 +20,6 @@ class Interface(BoxLayout):
     """
     _updateThread = None
     _updateWidgets = True
-    _tags = {} #teste
-    _tagsValvula4X = {}
-    _tagsTelaFP = {}
-    _tagsTempeRSTCarFP = {}
-    _tagsPartida4X = {}
-    _tagsMotor4X = {}
-    _tagsaque_umi_comdTermo4X={}
-    _tagsVeneziana4X = {}
 
     def __init__(self,**kwargs):
         super().__init__()
@@ -48,6 +40,9 @@ class Interface(BoxLayout):
         self._dados2BD = {}
         self._dadosUteis['4X']={}
         self._dadosUteis['FP']={}
+        
+        #Leitura de status
+        self._status = {}
 
          #escritas
         self._escritas = {}
@@ -55,19 +50,6 @@ class Interface(BoxLayout):
         self._escritas['FP'] ={}
         self._escritas['HRBits']={}
 
-        #Leitura de status
-        self._status = {}
-
-        ### usar apenas duas bibliotecas, uma para ações e outra de leituras
-
-        ##Dá cor e salva no dict _tags
-
-        for key, value in kwargs.get('endValvulas4X').items():
-            self._tagsValvula4X[key] = value
-
-        for key, value in kwargs.get('endVeneziana').items():
-            self._tagsVeneziana4X[key] = value
-        
         #Metodo de escrita e leitura
         self._conectaCLP = conectaCLP()
 
@@ -88,25 +70,30 @@ class Interface(BoxLayout):
         """
         Método para configurar ip e porta e inicializar a thread de leitura dos dados
         """
-        self._serverIP = ip
-        self._port = port
-        self._ClienteModbus.host = self._serverIP
-        self._ClienteModbus.port = self._port
-        try:
-            Window.set_system_cursor('wait')
-            self._ClienteModbus.open()
-            Window.set_system_cursor('arrow')
-            if self._ClienteModbus.is_open:
-                self._updateThread = Thread(target=self.atualizador)
-                self._updateThread.start()
-                self.ids.conexao.text = 'CONECTADO'
-                #self._ModbusPopup.ids.conBut.text='Desconectar'
-                self._ModbusPopup.dismiss()
-            else:
+        if self._ModbusPopup.ids.conBut.text == 'Conectar':
+            self._serverIP = ip
+            self._port = port
+            self._ClienteModbus.host = self._serverIP
+            self._ClienteModbus.port = self._port
+            try:
+                Window.set_system_cursor('wait')
+                self._ClienteModbus.open()
+                Window.set_system_cursor('arrow')
+                if self._ClienteModbus.is_open:
+                    self._updateThread = Thread(target=self.atualizador)
+                    self._updateThread.start()
+                    self.ids.conexao.text = 'CONECTADO'
+                    self._ModbusPopup.ids.conBut.text='Desconectar'
+                    self._ModbusPopup.dismiss()
+                else:
+                    self._ModbusPopup.porInfo('FALHA NA CONEXÃO!')
+            except Exception as e:
+                print("Erro", e.args)
                 self._ModbusPopup.porInfo('FALHA NA CONEXÃO!')
-        except Exception as e:
-            print("Erro", e.args)
-            self._ModbusPopup.porInfo('FALHA NA CONEXÃO!')
+        else:
+            self._ClienteModbus.close()
+            self.ids.conexao.text = 'DESCONECTADO'
+            self._ModbusPopup.ids.conBut.text='Conectar'
 
     def atualizador(self):
         """
@@ -138,27 +125,16 @@ class Interface(BoxLayout):
         for key,value in self._escritas['HRBits'].items():
             self._conectaCLP.escreveHRBits(self._ClienteModbus,int(key),value)   
         for key,value in self._escritas['FP'].items():
-            self._conectaCLP.escreveFP(self._ClienteModbus,int(key),value)      
+            self._conectaCLP.escreveFP(self._ClienteModbus,int(key),value)
+        # self._escritas['4X'] = None      
+        # self._escritas['HRBits'] = None      
+        # self._escritas['FP'] = None      
 
     def lerDados(self):
         """
         Metodo de leitura de dados pelo protocolo modbus
         Atualiza o atributo medidas
         """
-        # Dados da tela
-        # self._medidasTela['Timestamp'] = datetime.now()
-        # for key,value in self._tagsTelaFP.items():
-        #     self._medidasTela['Valores'][key] = self._conectaCLP.leFP(self._ClienteModbus,value['endereco'])
-            
-        #Leitura das Valvulas
-        for key, value in self._tagsValvula4X.items():
-            self._valvulas[key] = self._conectaCLP.leHRBits(self._ClienteModbus,value)
-
-        #Leitura de temperatura dos enrolamentos do motor e carcaça
-        # self._medidasTempRSTCar['Timestamp'] = datetime.now()
-        # for key,value in self._tagsTempeRSTCarFP.items():
-        #     self._conectaCLP.leHRBits(self._ClienteModbus,value['endereco'])
-        #     self._medidasTempRSTCar['Valores'][key] = self._conectaCLP.leFP(self._ClienteModbus,value['endereco'])
 
         #Leitura de dados que vão para o bd
         if self._comandoVent.ids.axial.active:
@@ -227,10 +203,16 @@ class Interface(BoxLayout):
         self._status['comp'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1328)
         self._status['velScroll'] = self._conectaCLP.le4X(self._ClienteModbus, 1236)
         self._status['pressao_comp'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1230)
-        self._status['veneziana'] = self._conectaCLP.leFP(self._ClienteModbus,1310)
+        self._status['veneziana'] = self._conectaCLP.leFP(self._ClienteModbus,1310) #ve.mv_escreve  
+        self._status['veneziana2'] = self._conectaCLP.leFP(self._ClienteModbus,814) #ve.mv_le
         #print('veneziana: '+ str(self._status['veneziana']))
         self._status['pid'] = self._conectaCLP.le4X(self._ClienteModbus,722)
         #print('pid: '+ str(self._status['pid']))
+        self._status['ValScrollHermetico'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1230)
+        self._status['Val5'] = self._conectaCLP.leHRBits(self._ClienteModbus, 1328)
+        self._status['status_ats48'] = self._conectaCLP.le4X(self._ClienteModbus,886)
+        self._status['status_atv31'] = self._conectaCLP.le4X(self._ClienteModbus,888)
+        self._status['status_tesys'] = self._conectaCLP.le4X(self._ClienteModbus,890)
 
     def atualizaInterface(self):
         """
@@ -247,18 +229,31 @@ class Interface(BoxLayout):
         self.ids.vazao.text =str(round(self._dadosUteis['FP']['vazao_saida'],2))+' m³/h'
         self.ids.vel.text =str(round(self._dadosUteis['FP']['velocidade_saida'],2))+' m/s'
         
-        if self._status['pressao_comp'][4] == 1:
-            self.ids.st_hermetico.text = 'Alta pressao'
+        #Status compressores
+        if self._status['pressao_comp'][11] == 1:
+            #self.ids.boxcomp.canvas.children[0].rgb= [1,0,0,1]
+            self.ids.st_scroll.text ='Alta pressão'
+        else:
+            # self.ids.st_scroll.text ='DESLIGADO'
+            # self.ids.boxcomp.canvas.children[0].rgb = [0,1,0,1]
+            pass
             
-        if self._status['pressao_comp'][5] == 1:
+        if self._status['pressao_comp'][10] == 1:
+            #self.ids.boxcomp.canvas.children[0].rgb = [1,0,0,1]
             self.ids.st_hermetico.text = 'Alta pressao'
-        
+        else:
+            #self.ids.st_scroll.text ='DESLIGADO'
+            #self.ids.boxcomp.canvas.children[0].rgb = [0,1,0,1]
+            pass
+
+        #veneziana
+        #self.ids.slider.value = self._status['veneziana2']
        
         #Valvulas
-        if self._valvulas['ve.xv_scroll.0'][15] == 1:
+        if self._status['ValScrollHermetico'][15] == 1:
             self.ids.xv1.source = 'imgs/ValvulaAzul.png'
             self.ids.xv3.source = 'imgs/ValvulaAzul.png'
-        elif self._valvulas['ve.xv_hermetico.1'][14]==1:
+        elif self._status['ValScrollHermetico'][14]==1:
             self.ids.xv2.source = 'imgs/ValvulaAzul.png'
             self.ids.xv4.source = 'imgs/ValvulaAzul.png'
         else:
@@ -267,10 +262,18 @@ class Interface(BoxLayout):
             self.ids.xv2.source = 'imgs/ValvulaBranca.png'
             self.ids.xv4.source = 'imgs/ValvulaBranca.png'
             
-        if self._valvulas['ve.xv5.7'][8]== 1:
+        if self._status['Val5'][8]== 1:
             self.ids.xv5.source = 'imgs/ValvulaAzul.png'
         else:
             self.ids.xv5.source = 'imgs/ValvulaBranca.png'
+
+        #ataualiza ventilador
+        if self._dadosUteis['4X']['status_ats48'] or self._dadosUteis['4X']['status_ats31'] or self._dadosUteis['4X']['status_tesys'] == 1:
+            self.estadoHelices(1,self._comandoVent.ids.axial.active)
+        elif self._dadosUteis['4X']['status_ats48'] and self._dadosUteis['4X']['status_ats31'] and self._dadosUteis['4X']['status_tesys'] == 0:
+            self.estadoHelices(0,self._comandoVent.ids.axial.active)
+        elif self._dadosUteis['4X']['status_ats48'] and self._dadosUteis['4X']['status_ats31'] and self._dadosUteis['4X']['status_tesys'] == 2:
+            self.estadoHelices(0,self._comandoVent.ids.axial.active)
 
         #Temperaturas R, S, T e Carcaça
         self._tempRSTCar.ids.temp_r.text =str(self._dadosUteis['FP']['temperatura_R'])+' ºC'
@@ -289,10 +292,10 @@ class Interface(BoxLayout):
         self._medidasTelaComp.ids.tensao_ST_co.text = str(self._dadosUteis['4X']['tensao_ST_co'])
         self._medidasTelaComp.ids.tensao_TR_co.text = str(self._dadosUteis['4X']['tensao_TR_co'])
 
-        self._medidasTelaComp.ids.potencia_R_co.text = str(self._dadosUteis['4X']['potencia_R_co'])
-        self._medidasTelaComp.ids.potencia_T_co.text = str(self._dadosUteis['4X']['potencia_T_co'])
-        self._medidasTelaComp.ids.potencia_S_co.text = str(self._dadosUteis['4X']['potencia_S_co'])
-        self._medidasTelaComp.ids.potencia_Total_co.text = str(self._dadosUteis['4X']['potencia_Total_co'])
+        self._medidasTelaComp.ids.potencia_ativa_R_co.text = str(self._dadosUteis['4X']['potencia_ativa_R_co'])
+        self._medidasTelaComp.ids.potencia_ativa_T_co.text = str(self._dadosUteis['4X']['potencia_ativa_T_co'])
+        self._medidasTelaComp.ids.potencia_ativa_S_co.text = str(self._dadosUteis['4X']['potencia_ativa_S_co'])
+        self._medidasTelaComp.ids.potencia_ativa_Total_co.text = str(self._dadosUteis['4X']['potencia_ativa_Total_co'])
 
         self._medidasTelaComp.ids.fp_R_co.text = str(self._dadosUteis['4X']['fp_R_co'])
         self._medidasTelaComp.ids.fp_T_co.text = str(self._dadosUteis['4X']['fp_T_co'])
@@ -310,16 +313,15 @@ class Interface(BoxLayout):
         self._medidasTelaVent.ids.tensao_ST.text = str(self._dadosUteis['4X']['tensao_ST'])
         self._medidasTelaVent.ids.tensao_TR.text = str(self._dadosUteis['4X']['tensao_TR'])
 
-        self._medidasTelaVent.ids.potencia_R.text = str(self._dadosUteis['4X']['potencia_R'])
-        self._medidasTelaVent.ids.potencia_T.text = str(self._dadosUteis['4X']['potencia_T'])
-        self._medidasTelaVent.ids.potencia_S.text = str(self._dadosUteis['4X']['potencia_S'])
-        self._medidasTelaVent.ids.potencia_Total.text = str(self._dadosUteis['4X']['potencia_Total'])
+        self._medidasTelaVent.ids.potencia_ativa_R.text = str(self._dadosUteis['4X']['potencia_ativa_R'])
+        self._medidasTelaVent.ids.potencia_ativa_T.text = str(self._dadosUteis['4X']['potencia_ativa_T'])
+        self._medidasTelaVent.ids.potencia_ativa_S.text = str(self._dadosUteis['4X']['potencia_ativa_S'])
+        self._medidasTelaVent.ids.potencia_ativa_Total.text = str(self._dadosUteis['4X']['potencia_ativa_Total'])
 
         self._medidasTelaVent.ids.fp_R.text = str(self._dadosUteis['4X']['fp_R'])
         self._medidasTelaVent.ids.fp_T.text = str(self._dadosUteis['4X']['fp_T'])
         self._medidasTelaVent.ids.fp_S.text = str(self._dadosUteis['4X']['fp_S'])
         self._medidasTelaVent.ids.fp_Total.text = str(self._dadosUteis['4X']['fp_Total'])
-
 
     def insereNoBD(self):
         for key,value in self._dadosUteis['FP'].items():
@@ -345,16 +347,16 @@ class Interface(BoxLayout):
         elif comando == 1: #ligar
             ### botar rendimento do motor
             #Trocar animação das helices
-            if self._comandoVent.ids.axial.active:
-                self.ids.helice0.source ='imgs/helicebaixadaAzul.png'
-                self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
-                self.ids.hel0.start()
-                self.ids.hel1.stop() 
-            elif self._comandoVent.ids.radial.active:
-                self.ids.helice1.source ='imgs/helicebaixadaAzul.png'
-                self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
-                self.ids.hel1.start()
-                self.ids.hel0.stop()
+            # if self._comandoVent.ids.axial.active:
+            #     self.ids.helice0.source ='imgs/helicebaixadaAzul.png'
+            #     self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
+            #     self.ids.hel0.start()
+            #     self.ids.hel1.stop() 
+            # elif self._comandoVent.ids.radial.active:
+            #     self.ids.helice1.source ='imgs/helicebaixadaAzul.png'
+            #     self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
+            #     self.ids.hel1.start()
+            #     self.ids.hel0.stop()
 
             # #se o motor estiver ligado, desliga
             if self._status['motorInversor'] or self._status['motorSoft'] or self._status['motorDireta'] ==1:
@@ -373,7 +375,7 @@ class Interface(BoxLayout):
             elif self._status['driver'] == 2:
                 self._escritas['4X']['1314']=int(self._atv31.ids.acc.text)/10
                 self._escritas['4X']['1315']=int(self._atv31.ids.dcc.text)/10
-                #self._escritas['4X']['1313']=self._comandoVent.ids.vel.text
+                self._escritas['4X']['1313']=self._atv31.ids.vel.text
                 self._escritas['4X']['1312']=comando
 
             ##caso direta
@@ -436,9 +438,7 @@ class Interface(BoxLayout):
                         
             self._status['aque_umi_com'][8] = 0
             self._escritas['HRBits']['1329']= self._status['aque_umi_com']
-            
-        
-            
+                       
     def comandoComp(self, comando):
         if comando == 0: # desligar
             self._status['aque_umi_com'][15] = 0
@@ -447,7 +447,7 @@ class Interface(BoxLayout):
             self._escritas['HRBits']['1328']= self._status['comp']
             
         elif comando == 1: #ligar
-            #self._escritas['4X']['1236'] = self._comandoComp.children.ids.comOnze.children[0].value
+            self._escritas['4X']=int(self._comandoComp._slider.value)
             self._status['comp'][11] = 1
             self._escritas['HRBits']['1328']= self._status['comp']
             self._status['aque_umi_com'][15] = 1
@@ -459,8 +459,7 @@ class Interface(BoxLayout):
         """
         if comando == 0: # scroll
             
-            #print(self._status['comp'])
-            #print(self._status['comp'][1])
+            #self._escritas['4X']=int(self._comandoComp._slider.value)
             self._status['comp'][14] = comando
             self._escritas['HRBits']['1328']= self._status['comp']
 
@@ -473,13 +472,12 @@ class Interface(BoxLayout):
             self._escritas['HRBits']['1328']= self._status['comp']
     
     def testeMoverVenezianas(self):
+        #já começa escrevendo, corrigir
         print((self.ids.slider.value))
         self._escritas['4X']['1332'] = 1
-        self._escritas['FP']['1310'] = int(self.ids.slider.value)
+        self._escritas['FP']['1310'] = self.ids.slider.value
         print(self._escritas['FP']['1310'])
-        #self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsVeneziana4X['ve.sel_pid'],1)
-        ### FAZER DICT QUE ARMAZENA LEITURAS
-        #self._conectaCLP.escreve4x(self._ClienteModbus, self._tagsVeneziana4X['ve.mv_escreve'],self.ids.slider.value)
+        pass
 
     ####SLIDERS DE VELOCIDADE SÓ FUNCIONAM AO CLICAR EM LIGAR, FAZER METODO QUE OS ATUALIZA
 
@@ -488,17 +486,24 @@ class Interface(BoxLayout):
         self.ids.veneziana2.angle = (-1)*(args[1]/100)*90
         self.ids.veneziana3.angle = (-1)*(args[1]/100)*90
 
-    def checkboxes(self,vent):
-        if vent == 1:
-            self.ids.helice0.source ='imgs/helicebaixadaAzul.png'
-            self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
-            self.ids.hel0.start()
-            self.ids.hel1.stop()
+    def estadoHelices(self,vent,tipo):
+        if  vent == 1:
+            if tipo:
+                self.ids.helice0.source ='imgs/helicebaixadaAzul.png'
+                self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
+                self.ids.hel0.start()
+                self.ids.hel1.stop()
+            else:
+                self.ids.helice1.source ='imgs/helicebaixadaAzul.png'
+                self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
+                self.ids.hel1.start()
+                self.ids.hel0.stop()
         elif vent == 0:
-            self.ids.helice1.source ='imgs/helicebaixadaAzul.png'
             self.ids.helice0.source ='imgs/helicebaixadaBrancasvg.png'
-            self.ids.hel1.start()
+            self.ids.helice1.source ='imgs/helicebaixadaBrancasvg.png'
+            self.ids.hel1.stop()
             self.ids.hel0.stop()
+
 
 class conectaCLP(ModbusClient):
 
@@ -527,7 +532,11 @@ class conectaCLP(ModbusClient):
         cliente.write_single_register(endereco,valor16bits)
 
     def escreveFP(self,cliente,endereco,valor):
-        pass
+        builder = BinaryPayloadBuilder(byteorder=Endian.Big, wordorder=Endian.Little)
+        builder.add_32bit_float(float(valor))
+        payload = builder.to_registers()
+        return cliente.write_multiple_registers(endereco, payload)
+        
 
 class Helices(FloatLayout):
     """
