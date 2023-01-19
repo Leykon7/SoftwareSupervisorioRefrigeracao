@@ -362,7 +362,7 @@
             color: 1, 1, 1
             size_hint: 0.1,0.1
             #pos: 500, 550
-            pos_hint: {'center_x':0.375,'center_y':0.69}
+            pos_hint: {'center_x':0.375,'center_y':0.65}
             on_value: 
                 root.venezianas(*args)
             on_touch_up:root.testeMoverVenezianas()
@@ -418,11 +418,7 @@
             canvas.after:
                 PopMatrix
 
-        TempBotao:
-            text: 'Medidas'
-            size_hint: 0.065, 0.04
-            #pos: 525, 525
-            pos_hint: {'x':0.345, 'y':0.62}
+
         #TemperaturaRST
         BoxLayout:
             orientation:'vertical'
@@ -437,3 +433,32 @@
             TempBotao: 
                 text:'Temperatura'
                 on_release: root._tempRSTCar.open()
+        #grafico        
+        BoxLayout:
+            orientation:'vertical'
+            pos_hint: {'x':0.265, 'y':0.45}
+            size_hint: 0.065, 0.04
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+14,self.height+14
+                    pos: self.x-7,self.y-7
+            TempBotao: 
+                text:'Grafico'
+                on_release: root._popupgrafico.open()
+        #BD
+        BoxLayout:
+            orientation:'vertical'
+            pos_hint: {'x':0.35, 'y':0.45}
+            size_hint: 0.065, 0.04
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+14,self.height+14
+                    pos: self.x-7,self.y-7
+            TempBotao: 
+                text:'Banco de dados'
+                on_release: root._bdPopup.open()
+

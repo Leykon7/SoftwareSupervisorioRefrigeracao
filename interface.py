@@ -43,13 +43,7 @@ class Interface(BoxLayout):
         self._persistencia = Persistencia()
 
         #Leituras
-        self._medidasTela = {}
-        self._medidasTela['Timestamp']=None
-        self._medidasTela['Valores']={}
         self._valvulas = {}
-        self._medidasTempRSTCar = {}
-        self._medidasTempRSTCar['Timestamp']=None
-        self._medidasTempRSTCar['Valores']={}
         self._dadosUteis={}
         self._dados2BD = {}
         self._dadosUteis['4X']={}
@@ -67,25 +61,9 @@ class Interface(BoxLayout):
         ### usar apenas duas bibliotecas, uma para ações e outra de leituras
 
         ##Dá cor e salva no dict _tags
-        for key, value in kwargs.get('endTelaFP').items():
-            cor_plot=(random.random(),random.random(),random.random(),1)
-            self._tagsTelaFP[key] = {'endereco': value, 'color': cor_plot}
-        
-        for key, value in kwargs.get('endTempFP').items():
-            cor_plot=(random.random(),random.random(),random.random(),1)
-            self. _tagsTempeRSTCarFP[key] = {'endereco': value, 'color': cor_plot}
 
         for key, value in kwargs.get('endValvulas4X').items():
             self._tagsValvula4X[key] = value
-
-        # for key, value in kwargs.get('endPartida4X').items():
-        #     self._tagsPartida4X[key] = value
-
-        # for key, value in kwargs.get('endMotor4X').items():
-        #     self._tagsMotor4X[key] = value
-
-        # for key, value in kwargs.get('endaque_umi_comdTerm4X').items():
-        #     self._tagsaque_umi_comdTermo4X[key] = value
 
         for key, value in kwargs.get('endVeneziana').items():
             self._tagsVeneziana4X[key] = value
@@ -103,6 +81,8 @@ class Interface(BoxLayout):
         self._tempRSTCar = popups.TempRSTCar()
         self._ats48 = popups.ats48()
         self._atv31 = popups.atv31()
+        self._popupgrafico = popups.popupgrafico()
+        self._bdPopup = popups.bdPopup()
                 
     def iniciaColetaDados(self,ip,port):
         """
@@ -273,15 +253,7 @@ class Interface(BoxLayout):
         if self._status['pressao_comp'][5] == 1:
             self.ids.st_hermetico.text = 'Alta pressao'
         
-        # self.ids.pit1.text =str((self._medidasTela['Valores']['ve.pit01'])/10)+' Psi'
-        # self.ids.pit2.text =str((self._medidasTela['Valores']['ve.pit02'])/10)+' Psi'
-        # self.ids.pit3.text =str((self._medidasTela['Valores']['ve.pit03'])/10)+' Psi'
-        # self.ids.tit1.text =str((self._medidasTela['Valores']['ve.tit01'])/10)+' ºC'
-        # self.ids.tit2.text =str((self._medidasTela['Valores']['ve.tit02'])/10)+' ºC'
-        # self.ids.tit3.text =str(round(self._medidasTela['Valores']['ve.temperatura'],2))+' ºC'
-        # self.ids.vazao.text =str(self._medidasTela['Valores']['ve.vazao'])+' m³/h'
-        # self.ids.vel.text =str(self._medidasTela['Valores']['ve.velocidade'])+' m/s'
-
+       
         #Valvulas
         if self._valvulas['ve.xv_scroll.0'][15] == 1:
             self.ids.xv1.source = 'imgs/ValvulaAzul.png'
@@ -306,10 +278,48 @@ class Interface(BoxLayout):
         self._tempRSTCar.ids.temp_t.text =str(self._dadosUteis['FP']['temperatura_T'])+' ºC'
         self._tempRSTCar.ids.carcaca.text =str(self._dadosUteis['FP']['temperatura_Carc'])+' ºC'
 
-        # self._tempRSTCar.ids.temp_r.text =str((self._medidasTempRSTCar['Valores']['ve.temp_r'])/10)+' ºC'
-        # self._tempRSTCar.ids.temp_s.text =str((self._medidasTempRSTCar['Valores']['ve.temp_s'])/10)+' ºC'
-        # self._tempRSTCar.ids.temp_t.text =str((self._medidasTempRSTCar['Valores']['ve.temp_t'])/10)+' ºC'
-        # self._tempRSTCar.ids.carcaca.text =str((self._medidasTempRSTCar['Valores']['ve.temp_carc'])/10)+' ºC'
+        #medidas do compressor
+        self._medidasTelaComp.ids.corrente_R_co.text = str(self._dadosUteis['4X']['corrente_R_co'])
+        self._medidasTelaComp.ids.corrente_T_co.text = str(self._dadosUteis['4X']['corrente_T_co'])
+        self._medidasTelaComp.ids.corrente_S_co.text = str(self._dadosUteis['4X']['corrente_S_co'])
+        self._medidasTelaComp.ids.corrente_N_co.text = str(self._dadosUteis['4X']['corrente_N_co'])
+        self._medidasTelaComp.ids.corrente_Media_co.text = str(self._dadosUteis['4X']['corrente_Media_co'])
+
+        self._medidasTelaComp.ids.tensao_RS_co.text = str(self._dadosUteis['4X']['tensao_RS_co'])
+        self._medidasTelaComp.ids.tensao_ST_co.text = str(self._dadosUteis['4X']['tensao_ST_co'])
+        self._medidasTelaComp.ids.tensao_TR_co.text = str(self._dadosUteis['4X']['tensao_TR_co'])
+
+        self._medidasTelaComp.ids.potencia_R_co.text = str(self._dadosUteis['4X']['potencia_R_co'])
+        self._medidasTelaComp.ids.potencia_T_co.text = str(self._dadosUteis['4X']['potencia_T_co'])
+        self._medidasTelaComp.ids.potencia_S_co.text = str(self._dadosUteis['4X']['potencia_S_co'])
+        self._medidasTelaComp.ids.potencia_Total_co.text = str(self._dadosUteis['4X']['potencia_Total_co'])
+
+        self._medidasTelaComp.ids.fp_R_co.text = str(self._dadosUteis['4X']['fp_R_co'])
+        self._medidasTelaComp.ids.fp_T_co.text = str(self._dadosUteis['4X']['fp_T_co'])
+        self._medidasTelaComp.ids.fp_S_co.text = str(self._dadosUteis['4X']['fp_S_co'])
+        self._medidasTelaComp.ids.fp_Total_co.text = str(self._dadosUteis['4X']['fp_Total_co'])
+
+        #medidas do ventilador
+        self._medidasTelaVent.ids.corrente_R.text = str(self._dadosUteis['4X']['corrente_R'])
+        self._medidasTelaVent.ids.corrente_T.text = str(self._dadosUteis['4X']['corrente_T'])
+        self._medidasTelaVent.ids.corrente_S.text = str(self._dadosUteis['4X']['corrente_S'])
+        self._medidasTelaVent.ids.corrente_N.text = str(self._dadosUteis['4X']['corrente_N'])
+        self._medidasTelaVent.ids.corrente_Media.text = str(self._dadosUteis['4X']['corrente_Media'])
+
+        self._medidasTelaVent.ids.tensao_RS.text = str(self._dadosUteis['4X']['tensao_RS'])
+        self._medidasTelaVent.ids.tensao_ST.text = str(self._dadosUteis['4X']['tensao_ST'])
+        self._medidasTelaVent.ids.tensao_TR.text = str(self._dadosUteis['4X']['tensao_TR'])
+
+        self._medidasTelaVent.ids.potencia_R.text = str(self._dadosUteis['4X']['potencia_R'])
+        self._medidasTelaVent.ids.potencia_T.text = str(self._dadosUteis['4X']['potencia_T'])
+        self._medidasTelaVent.ids.potencia_S.text = str(self._dadosUteis['4X']['potencia_S'])
+        self._medidasTelaVent.ids.potencia_Total.text = str(self._dadosUteis['4X']['potencia_Total'])
+
+        self._medidasTelaVent.ids.fp_R.text = str(self._dadosUteis['4X']['fp_R'])
+        self._medidasTelaVent.ids.fp_T.text = str(self._dadosUteis['4X']['fp_T'])
+        self._medidasTelaVent.ids.fp_S.text = str(self._dadosUteis['4X']['fp_S'])
+        self._medidasTelaVent.ids.fp_Total.text = str(self._dadosUteis['4X']['fp_Total'])
+
 
     def insereNoBD(self):
         for key,value in self._dadosUteis['FP'].items():
@@ -465,7 +475,7 @@ class Interface(BoxLayout):
     def testeMoverVenezianas(self):
         print((self.ids.slider.value))
         self._escritas['4X']['1332'] = 1
-        self._escritas['FP']['1310'] = self.ids.slider.value
+        self._escritas['FP']['1310'] = int(self.ids.slider.value)
         print(self._escritas['FP']['1310'])
         #self._conectaCLP.escreve4x(self._ClienteModbus,self._tagsVeneziana4X['ve.sel_pid'],1)
         ### FAZER DICT QUE ARMAZENA LEITURAS

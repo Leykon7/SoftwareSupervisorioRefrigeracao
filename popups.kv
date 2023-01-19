@@ -956,13 +956,160 @@
         step:1
         size_hint_y:0.25
 
+<popupgrafico>:
+    title: 'Gráfico'
+    size_hint: 0.9,0.9
+    BoxLayout:
+        padding:14
+        spacing:14
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        orientation:'vertical'
+        BoxLayout:
+            id:areagrafico 
+            padding:7 
+            orientation:'horizontal'
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+        BoxLayout:
+            size_hint_y: 0.125
+            orientation:'horizontal'
+            padding:7
+            spacing:7
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text: 'Pressão'
+                on_release: root.addGrafico()
+            TempBotao:
+                text: 'Temperatura'
+                on_release: root.addGrafico()
+            TempBotao:
+                text: 'Vazão'
+                on_release: root.addGrafico()
+            TempBotao:
+                text:'Velocidade do ar'
+                on_release: root.addGrafico()
+        BoxLayout:
+            orientation:'horizontal'
+            padding:7
+            spacing:7
+            size_hint_y: 0.125
+            size_hint_x:0.25
+            pos_hint:{'center_x':0.5}
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            TempBotao:
+                text:'Fechar'
+                on_release: 
+                    root.dismiss()
+                    root.removeGrafico()
 
-    # self._opcMainBox = BoxLayout(orientation='vertical',spacing=7)
-    #     self._opcMainBox.add_widget(self._opcGrid)
-    #     if tipo:
-    #         self._opcMainBox.add_widget(Slider(orientation='horizontal', min=0, max=100, step=1, size_hint_y=0.25))
-    #     self._opcMainBox.add_widget(self._opcBox)
+<grafico>:
+    xlabel:'X'
+    ylabel:'Y'
+    x_ticks_major:60
+    x_ticks_minor:4
+    y_ticks_major:100
+    y_ticks_minor:10
+    y_grid_label:True
+    x_grid_label:True
+    padding:5
+    x_grid:True
+    y_grid:True
+    xmin:50
+    xmax:100
+    ymin:50
+    ymax:100
 
+<bdPopup>:
+    title: 'Banco de Dados'
+    size_hint: 0.9,0.9
+    BoxLayout:
+        orientation: 'vertical'
+        padding:14
+        spacing:14
+        canvas:
+            Color:
+                rgb: 225/255, 228/255, 235/255
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        
+        BoxLayout:
+            orientation:'horizontal'
+            rows:2
+            cols:3
+            padding:7
+            spacing:7
+            size_hint_y:0.25
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+
+            BoxLayout:
+                orientation:'vertical'
+                spacing:7
+                Label:
+                    text:'Digite o horário inicial para a busca (DD/MM/AAAA HH:MM:SS):'
+                    color: 98/255, 113/255, 142/255
+                Label:
+                    text:'Digite o horário final para a busca (DD/MM/AAAA HH:MM:SS):'
+                    color: 98/255, 113/255, 142/255
+
+            BoxLayout:
+                size_hint_x:0.5
+                orientation:'vertical'
+                spacing:7
+                TextInput:
+                    id:inicial
+                    halign:'center'
+                TextInput:
+                    id:final
+                    halign:'center'
+
+            BoxLayout:
+                orientation:'vertical'
+                size_hint_x:0.25
+                spacing:7
+                TempBotao:
+                    text:'Pesquisar'
+                    on_release:root.printarTable()
+                TempBotao:
+                    text:'Fechar'
+                    on_release:root.dismiss()
+            
+        BoxLayout:
+            orientation:'horizontal'
+            canvas:
+                Color:
+                    rgb:203/255, 208/255, 219/255
+                Rectangle:
+                    size: self.width+3,self.height+3
+                    pos: self.x-3,self.y-3
+            Label:
+                id:table
+                text:''
+                    
 
 <TempBotao@Button>:
     background_normal: ''

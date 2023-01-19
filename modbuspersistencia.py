@@ -33,22 +33,21 @@ class Persistencia(object):
         except Exception as e:
             print("Erro: ", e.args)
 
-    def acesso_dados_historicos(self):
+    def acesso_dados_historicos(self, init, final):
         """
         Método que permite ao usuário acessar dados históricos
         """
         try:
-            print("Bem vindo ao sistema de busca de dados históricos")
             while True:
-                init = input("Digite o horário inicial para a busca (DD/MM/AAAA HH:MM:SS):")
-                final = input("Digite o horário final para a busca (DD/MM/AAAA HH:MM:SS):")
+                # init = input("Digite o horário inicial para a busca (DD/MM/AAAA HH:MM:SS):")
+                # final = input("Digite o horário final para a busca (DD/MM/AAAA HH:MM:SS):")
                 init = datetime.strptime(init, '%d/%m/%Y %H:%M:%S')
                 final = datetime.strptime(final, '%d/%m/%Y %H:%M:%S')
                 self._lock.acquire()
                 results = self._session.query(DadoCLP).filter(DadoCLP.timestamp.between(init,final)).all()
                 self._lock.release()
                 results_fmt_lst = [reg.get_attr_printable_list() for reg in results]
-                print(tabulate(results_fmt_lst,headers=DadoCLP.__table__.columns.keys()))
+                return tabulate(results_fmt_lst,headers=DadoCLP.__table__.columns.keys())
         except Exception as e:
             print("Erro: ", e.args)
 
